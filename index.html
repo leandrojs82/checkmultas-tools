@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CheckMultas · Ferramentas</title>
+
+<!-- SheetJS para leitura/escrita de Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+/* =============================================
+   SEÇÃO 1: VARIÁVEIS DE TEMA (dark / light)
+   ============================================= */
+:root {
+  --bg:        #0f1117;
+  --bg2:       #1a1d27;
+  --bg3:       #252836;
+  --border:    #2e3147;
+  --accent:    #5b7fff;
+  --accent2:   #7c5bff;
+  --success:   #3ecf8e;
+  --warn:      #f5a623;
+  --danger:    #e05252;
+  --text:      #e2e5f0;
+  --text2:     #8b92ae;
+  --text3:     #5a6282;
+  --radius:    10px;
+  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+}
+[data-theme="light"] {
+  --bg:        #f0f2f8;
+  --bg2:       #ffffff;
+  --bg3:       #e6e9f4;
+  --border:    #d0d5e8;
+  --accent:    #3b5bdb;
+  --accent2:   #6741d9;
+  --success:   #2f9e68;
+  --warn:      #d48806;
+  --danger:    #c92a2a;
+  --text:      #1a1d27;
+  --text2:     #495380;
+  --text3:     #8b92ae;
+  --shadow:    0 4px 24px rgba(0,0,0,0.12);
+}
+
+/* =============================================
+   SEÇÃO 2: RESET E BASE
+   ============================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+button { cursor: pointer; font-family: inherit; }
+textarea, input { font-family: inherit; }
+
+/* =============================================
+   SEÇÃO 3: HEADER
+   ============================================= */
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+.header-logo span {
+  color: var(--accent);
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-theme {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.btn-theme:hover { background: var(--border); color: var(--text); }
+
+/* =============================================
+   SEÇÃO 4: HOME — CARDS
+   ============================================= */
+.home-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+.home-hero {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.home-hero h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+.home-hero h1 span { color: var(--accent); }
+.home-hero p {
+  color: var(--text2);
+  font-size: 1rem;
+}
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 24px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+.card-icon.blue  { background: rgba(91,127,255,0.15); }
+.card-icon.green { background: rgba(62,207,142,0.15); }
+.card-icon.orange{ background: rgba(245,166,35,0.15); }
+.card-icon.purple{ background: rgba(124,91,255,0.15); }
+.card h3 { font-size: 1rem; font-weight: 700; }
+.card p  { font-size: 0.85rem; color: var(--text2); line-height: 1.5; flex: 1; }
+.card-action {
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* =============================================
+   SEÇÃO 5: APP PAGE (quando um app está aberto)
+   ============================================= */
+.app-page { display: none; }
+.app-page.active { display: block; }
+.home-page.hidden { display: none; }
+
+.app-header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.btn-back {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.btn-back:hover { background: var(--border); color: var(--text); }
+.app-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+/* =============================================
+   SEÇÃO 6: COMPONENTES COMUNS AOS APPS
+   ============================================= */
+.app-body {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+textarea.app-input {
+  width: 100%;
+  background: var(--bg2);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 14px;
+  font-size: 0.88rem;
+  resize: vertical;
+  transition: border-color 0.2s;
+  outline: none;
+}
+textarea.app-input:focus { border-color: var(--accent); border-style: solid; }
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: scale(0.97); }
+.btn-secondary {
+  background: var(--bg3);
+  color: var(--text2);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { background: var(--border); color: var(--text); }
+.btn-success {
+  background: var(--success);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+.btn-success:hover { opacity: 0.85; }
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 14px 0;
+}
+.result-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-top: 16px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.result-box.success { border-color: var(--success); }
+.result-box.error   { border-color: var(--danger);  }
+.result-box.warn    { border-color: var(--warn);    }
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.tag.green  { background: rgba(62,207,142,0.15); color: var(--success); }
+.tag.red    { background: rgba(224,82,82,0.15);  color: var(--danger);  }
+.tag.blue   { background: rgba(91,127,255,0.15); color: var(--accent);  }
+.tag.orange { background: rgba(245,166,35,0.15); color: var(--warn);    }
+.stat-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+}
+.stat-card .num { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+.stat-card .lbl { font-size: 0.75rem; color: var(--text2); margin-top: 2px; }
+table.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+table.result-table th {
+  background: var(--bg3);
+  color: var(--text2);
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+table.result-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+table.result-table tr:hover td { background: var(--bg3); }
+.scroll-table { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+.msg { font-size: 0.85rem; color: var(--text2); padding: 10px 0; }
+
+/* =============================================
+   SEÇÃO 7: APP 1 — CONVERSOR DE PLACAS
+   ============================================= */
+.plate-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0;
+}
+.plate-badge {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-family: 'Courier New', monospace;
+  min-width: 110px;
+  text-align: center;
+}
+.plate-badge.original-trad  { background: rgba(91,127,255,0.18); color: #7da4ff; }
+.plate-badge.original-merc  { background: rgba(62,207,142,0.18); color: #3ecf8e; }
+.plate-badge.converted      { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+.plate-info { flex: 1; font-size: 0.82rem; color: var(--text2); }
+.arrow-icon { color: var(--text3); font-size: 1.1rem; }
+
+/* =============================================
+   SEÇÃO 8: APP 2 — VALIDADOR DE PLACAS
+   ============================================= */
+.valid-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  margin: 4px 0;
+  background: var(--bg3);
+  font-family: 'Courier New', monospace;
+  font-size: 0.88rem;
+}
+.valid-item .line-num { color: var(--text3); font-size: 0.75rem; min-width: 28px; }
+.valid-item .plate-str { font-weight: 700; flex: 1; }
+.valid-item.valid-row   { border-left: 3px solid var(--success); }
+.valid-item.invalid-row { border-left: 3px solid var(--danger);  }
+.valid-item .reason { font-size: 0.75rem; color: var(--danger); font-family: inherit; }
+.group-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 10px 0 4px;
+}
+.group-title.g-valid   { color: var(--success); }
+.group-title.g-invalid { color: var(--danger);  }
+
+/* =============================================
+   SEÇÃO 9: APP 3 — JSON → CSV
+   ============================================= */
+.preview-table-wrap {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* =============================================
+   SEÇÃO 10: APP 4 — PROCESSADOR EXCEL
+   ============================================= */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  padding: 48px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: var(--bg2);
+}
+.drop-zone.drag-over {
+  border-color: var(--accent);
+  background: rgba(91,127,255,0.06);
+}
+.drop-zone input[type="file"] { display: none; }
+.drop-icon { font-size: 2.5rem; margin-bottom: 10px; }
+.drop-zone h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+.drop-zone p  { font-size: 0.85rem; color: var(--text2); }
+
+/* =============================================
+   SEÇÃO 11: RESPONSIVIDADE
+   ============================================= */
+@media (max-width: 600px) {
+  .home-hero h1 { font-size: 1.5rem; }
+  .app-body { padding: 20px 14px; }
+  .drop-zone { padding: 30px 16px; }
+  .stat-row { gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER GLOBAL ===== -->
+<header class="header">
+  <a class="header-logo" href="#" onclick="goHome(); return false;">
+    <span>⚡</span> CheckMultas <span style="color:var(--text2);font-weight:400;font-size:0.9rem;">Ferramentas</span>
+  </a>
+  <div class="header-right">
+    <button class="btn-theme" onclick="toggleTheme()" id="btnTheme">☀ Claro</button>
+  </div>
+</header>
+
+<!-- ===== PÁGINA INICIAL ===== -->
+<div class="home-page" id="homePage">
+  <div class="home-hero">
+    <h1>Ferramentas <span>CheckMultas</span></h1>
+    <p>Utilitários para processamento de placas, infrações e dados veiculares</p>
+  </div>
+
+  <div class="cards-grid">
+
+    <!-- Card 1 -->
+    <div class="card" onclick="openApp('conversor')">
+      <div class="card-icon blue">🔄</div>
+      <h3>Conversor de Placas</h3>
+      <p>Converte placas entre o formato tradicional (ABC-1234) e Mercosul (ABC1D23) em lote, com exportação SQL <code>IN (...)</code>.</p>
+      <div class="card-action">Abrir ferramenta →</div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card" onclick="openApp('validador')">
+      <div class="card-icon green">✅</div>
+      <h3>Validador de Placas</h3>
+      <p>Valida lotes de placas nos dois formatos com diagnóstico por posição, separando válidas de inválidas com download XLSX.</p>
+      <div class="card-action">Abrir ferramenta →</div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card" onclick="openApp('jsoncsv')">
+      <div class="card-icon orange">📋</div>
+      <h3>Conversor JSON → CSV</h3>
+      <p>Converte um ou múltiplos objetos JSON em CSV compatível com Excel, extraindo placas em formato SQL.</p>
+      <div class="card-action">Abrir ferramenta →</div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="card" onclick="openApp('excel')">
+      <div class="card-icon purple">📊</div>
+      <h3>Processador de Excel</h3>
+      <p>Reorganiza colunas de planilhas XLSX para o formato padrão, converte datas e exporta CSV com delimitador ponto e vírgula.</p>
+      <div class="card-action">Abrir ferramenta →</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====================================================
+     APP 1: CONVERSOR DE PLACAS
+     ==================================================== -->
+<div class="app-page" id="app-conversor">
+  <div class="app-header">
+    <button class="btn-back" onclick="goHome()">← Início</button>
+    <span class="app-title">🔄 Conversor de Placas Mercosul ↔ Tradicional</span>
+  </div>
+  <div class="app-body">
+    <div class="section-label">Placas para converter (uma por linha ou separadas por espaço/vírgula)</div>
+    <textarea class="app-input" id="conv-input" rows="6"
+      placeholder="Exemplos:&#10;ABC1234&#10;ABC1D23&#10;('HKT0416','RGA2D75')"></textarea>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="converterPlacas()">Converter</button>
+      <button class="btn-secondary" onclick="document.getElementById('conv-input').value=''; document.getElementById('conv-results').innerHTML=''">Limpar</button>
+    </div>
+
+    <div id="conv-stats" class="stat-row" style="display:none"></div>
+
+    <div id="conv-results"></div>
+
+    <div id="conv-sql-wrap" style="display:none">
+      <hr class="divider">
+      <div class="section-label">SQL IN — Placas Originais</div>
+      <div class="result-box" id="conv-sql-orig" style="font-family:monospace;font-size:0.82rem;word-break:break-all;"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="copiarSQL('orig')">📋 Copiar originais</button>
+        <button class="btn-secondary" onclick="copiarSQL('conv')">📋 Copiar convertidas</button>
+        <button class="btn-secondary" onclick="copiarSQL('all')">📋 Copiar todas</button>
+      </div>
+      <div class="section-label" style="margin-top:14px">SQL IN — Placas Convertidas</div>
+      <div class="result-box" id="conv-sql-conv" style="font-family:monospace;font-size:0.82rem;word-break:break-all;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================
+     APP 2: VALIDADOR DE PLACAS
+     ==================================================== -->
+<div class="app-page" id="app-validador">
+  <div class="app-header">
+    <button class="btn-back" onclick="goHome()">← Início</button>
+    <span class="app-title">✅ Validador de Placas em Lote</span>
+  </div>
+  <div class="app-body">
+    <div class="section-label">Placas para validar (uma por linha)</div>
+    <textarea class="app-input" id="val-input" rows="8"
+      placeholder="ABC1234&#10;ABC1D23&#10;XYZ9K88&#10;INVALIDA"></textarea>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="validarPlacas()">Validar</button>
+      <button class="btn-secondary" onclick="val_limpar()">Limpar</button>
+      <button class="btn-success" id="val-btn-xlsx-valid"   style="display:none" onclick="val_exportXlsx('validas')">⬇ Válidas XLSX</button>
+      <button class="btn-success" id="val-btn-xlsx-invalid" style="display:none" onclick="val_exportXlsx('invalidas')">⬇ Inválidas XLSX</button>
+    </div>
+
+    <div id="val-stats" class="stat-row" style="display:none"></div>
+    <div id="val-results"></div>
+  </div>
+</div>
+
+<!-- ====================================================
+     APP 3: CONVERSOR JSON → CSV
+     ==================================================== -->
+<div class="app-page" id="app-jsoncsv">
+  <div class="app-header">
+    <button class="btn-back" onclick="goHome()">← Início</button>
+    <span class="app-title">📋 Conversor JSON → CSV</span>
+  </div>
+  <div class="app-body">
+    <div class="section-label">Cole o JSON aqui (objeto único, array ou múltiplos objetos)</div>
+    <textarea class="app-input" id="json-input" rows="8"
+      placeholder='{"placa":"ABC1234","chassi":"9BWZZZ377VT004251","renavam":"123456789","empresa":"1","uf":"MG"}&#10;{"placa":"XYZ5K78","chassi":"ABC...","renavam":"987654321","empresa":"2","uf":"SP"}'></textarea>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="converterJSON()">Converter para CSV</button>
+      <button class="btn-secondary" onclick="json_limpar()">Limpar</button>
+    </div>
+
+    <div id="json-stats" class="stat-row" style="display:none"></div>
+    <div id="json-results"></div>
+    <div id="json-action-row" class="btn-row" style="display:none">
+      <button class="btn-success" onclick="json_downloadCSV()">⬇ Baixar CSV</button>
+      <button class="btn-secondary" onclick="json_copiarSQL()">📋 Copiar SQL IN (placas)</button>
+    </div>
+    <div id="json-sql-wrap" style="display:none">
+      <hr class="divider">
+      <div class="section-label">SQL IN — Placas</div>
+      <div class="result-box" id="json-sql-out" style="font-family:monospace;font-size:0.82rem;word-break:break-all;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================
+     APP 4: PROCESSADOR DE EXCEL
+     ==================================================== -->
+<div class="app-page" id="app-excel">
+  <div class="app-header">
+    <button class="btn-back" onclick="goHome()">← Início</button>
+    <span class="app-title">📊 Processador de Excel</span>
+  </div>
+  <div class="app-body">
+
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('excel-file-input').click()">
+      <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" onchange="excel_onFileSelect(event)">
+      <div class="drop-icon">📂</div>
+      <h3>Arraste um arquivo XLSX aqui</h3>
+      <p>ou clique para selecionar · Formatos aceitos: .xlsx, .xls, .csv</p>
+    </div>
+
+    <div id="excel-file-info" style="display:none" class="result-box" style="margin-top:14px"></div>
+
+    <div id="excel-stats" class="stat-row" style="display:none"></div>
+
+    <div id="excel-action-row" class="btn-row" style="display:none">
+      <button class="btn-success" onclick="excel_downloadCSV()">⬇ Baixar CSV</button>
+      <button class="btn-secondary" onclick="excel_limpar()">Limpar</button>
+    </div>
+
+    <div id="excel-preview" style="display:none">
+      <hr class="divider">
+      <div class="section-label">Pré-visualização (primeiras 10 linhas — após reorganização)</div>
+      <div class="scroll-table" id="excel-preview-table"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ====================================================
+     JAVASCRIPT
+     ==================================================== -->
+<script>
+/* ==============================================
+   A) NAVEGAÇÃO ENTRE PÁGINAS
+   ============================================== */
+function openApp(id) {
+  document.getElementById('homePage').classList.add('hidden');
+  document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
+  document.getElementById('app-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function goHome() {
+  document.getElementById('homePage').classList.remove('hidden');
+  document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
+  window.scrollTo(0, 0);
+}
+
+/* ==============================================
+   B) TEMA DARK / LIGHT
+   ============================================== */
+(function initTheme() {
+  const saved = localStorage.getItem('cm_theme') ||
+    (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  setTheme(saved);
+})();
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('btnTheme').textContent = t === 'dark' ? '☀ Claro' : '🌙 Escuro';
+  localStorage.setItem('cm_theme', t);
+}
+function toggleTheme() {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+
+/* ==============================================
+   C) UTILITÁRIOS COMUNS
+   ============================================== */
+function escSQL(s) { return s.replace(/'/g, "''"); }
+function copiarTexto(txt) {
+  if (navigator.clipboard) { navigator.clipboard.writeText(txt); return; }
+  const ta = document.createElement('textarea');
+  ta.value = txt; document.body.appendChild(ta); ta.select();
+  document.execCommand('copy'); document.body.removeChild(ta);
+}
+function strToSQL(arr) {
+  return '(' + arr.map(p => `'${escSQL(p)}'`).join(', ') + ')';
+}
+
+/* ==============================================
+   D) APP 1: CONVERSOR DE PLACAS
+   Tabela oficial Denatran: 0→A, 1→B, ..., 9→J
+   ============================================== */
+const MERC_TABLE = {
+  '0':'A','1':'B','2':'C','3':'D','4':'E',
+  '5':'F','6':'G','7':'H','8':'I','9':'J'
+};
+const MERC_REVERSE = Object.fromEntries(Object.entries(MERC_TABLE).map(([k,v])=>[v,k]));
+
+// Detecta formato da placa
+function detectaFormato(p) {
+  if (/^[A-Z]{3}\d{4}$/.test(p)) return 'tradicional';
+  if (/^[A-Z]{3}\d[A-Z]\d{2}$/.test(p)) return 'mercosul';
+  return null;
+}
+// Converte tradicional → mercosul
+function tradParaMerc(p) {
+  return p.slice(0,4) + MERC_TABLE[p[4]] + p.slice(5);
+}
+// Converte mercosul → tradicional
+function mercParaTrad(p) {
+  const letra = p[4];
+  if (!MERC_REVERSE[letra]) return null;
+  return p.slice(0,4) + MERC_REVERSE[letra] + p.slice(5);
+}
+// Parse de texto bruto: extrai placas candidatas
+function parsePlacas(raw) {
+  return [...raw.matchAll(/[A-Za-z]{3}[\dA-Za-z]{4}/g)]
+    .map(m => m[0].toUpperCase())
+    .filter((v, i, a) => a.indexOf(v) === i); // deduplicar
+}
+
+let convOriginals  = [];
+let convConverted  = [];
+
+function converterPlacas() {
+  const raw = document.getElementById('conv-input').value.trim();
+  if (!raw) return;
+
+  const placas = parsePlacas(raw);
+  const results = [];
+  convOriginals  = [];
+  convConverted  = [];
+
+  for (const p of placas) {
+    const fmt = detectaFormato(p);
+    if (!fmt) continue;
+
+    let converted, label;
+    if (fmt === 'tradicional') {
+      converted = tradParaMerc(p);
+      label = 'Trad → Merc';
+    } else {
+      converted = mercParaTrad(p);
+      label = converted ? 'Merc → Trad' : null;
+    }
+    if (!converted) continue;
+
+    results.push({ original: p, converted, fmt, label });
+    convOriginals.push(p);
+    convConverted.push(converted);
+  }
+
+  // Estatísticas
+  const statsEl = document.getElementById('conv-stats');
+  statsEl.style.display = results.length ? 'flex' : 'none';
+  statsEl.innerHTML = `
+    <div class="stat-card"><div class="num">${results.length}</div><div class="lbl">Placas convertidas</div></div>
+    <div class="stat-card"><div class="num">${results.filter(r=>r.fmt==='tradicional').length}</div><div class="lbl">Trad → Merc</div></div>
+    <div class="stat-card"><div class="num">${results.filter(r=>r.fmt==='mercosul').length}</div><div class="lbl">Merc → Trad</div></div>
+  `;
+
+  // Renderiza cards
+  const resEl = document.getElementById('conv-results');
+  if (!results.length) {
+    resEl.innerHTML = '<div class="result-box error">Nenhuma placa reconhecida. Verifique o formato (ABC1234 ou ABC1D23).</div>';
+    document.getElementById('conv-sql-wrap').style.display = 'none';
+    return;
+  }
+  resEl.innerHTML = results.map(r => `
+    <div class="plate-card">
+      <div class="plate-badge ${r.fmt === 'tradicional' ? 'original-trad' : 'original-merc'}">${r.original}</div>
+      <div class="arrow-icon">→</div>
+      <div class="plate-badge converted">${r.converted}</div>
+      <div class="plate-info"><span class="tag blue">${r.label}</span></div>
+    </div>
+  `).join('');
+
+  // SQL
+  const sqlWrap = document.getElementById('conv-sql-wrap');
+  sqlWrap.style.display = 'block';
+  document.getElementById('conv-sql-orig').textContent = strToSQL(convOriginals);
+  document.getElementById('conv-sql-conv').textContent = strToSQL(convConverted);
+}
+
+function copiarSQL(tipo) {
+  if (tipo === 'orig') copiarTexto(strToSQL(convOriginals));
+  else if (tipo === 'conv') copiarTexto(strToSQL(convConverted));
+  else copiarTexto(strToSQL([...convOriginals, ...convConverted]));
+}
+
+
+/* ==============================================
+   E) APP 2: VALIDADOR DE PLACAS EM LOTE
+   Formato tradicional: AAA0000 (LLLNNNN)
+   Formato Mercosul:    AAA0A00 (LLLNLNN)
+   ============================================== */
+const REGEX_TRAD = /^[A-Z]{3}\d{4}$/;
+const REGEX_MERC = /^[A-Z]{3}\d[A-Z]\d{2}$/;
+
+let val_validas   = [];
+let val_invalidas = [];
+
+function detectaErroPlaca(p) {
+  if (p.length !== 7) return `Tamanho inválido (${p.length} caracteres, esperado 7)`;
+  const erros = [];
+  // Posições 0,1,2 devem ser letras
+  for (let i = 0; i < 3; i++) {
+    if (!/[A-Z]/.test(p[i])) erros.push(`Pos ${i+1}: letra esperada, encontrado '${p[i]}'`);
+  }
+  // Posição 3 deve ser dígito
+  if (!/\d/.test(p[3])) erros.push(`Pos 4: dígito esperado, encontrado '${p[3]}'`);
+  // Posição 4: dígito (trad) ou letra (merc)
+  if (!/[\dA-Z]/.test(p[4])) erros.push(`Pos 5: dígito ou letra esperada, encontrado '${p[4]}'`);
+  // Posições 5,6: dígitos
+  for (let i = 5; i < 7; i++) {
+    if (!/\d/.test(p[i])) erros.push(`Pos ${i+1}: dígito esperado, encontrado '${p[i]}'`);
+  }
+  return erros.join('; ') || 'Formato inválido';
+}
+
+function validarPlacas() {
+  const linhas = document.getElementById('val-input').value
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 0);
+
+  val_validas   = [];
+  val_invalidas = [];
+  const rows = [];
+
+  linhas.forEach((linha, idx) => {
+    const p = linha.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const valida = REGEX_TRAD.test(p) || REGEX_MERC.test(p);
+    const fmt = REGEX_MERC.test(p) ? 'Mercosul' : (REGEX_TRAD.test(p) ? 'Tradicional' : '');
+    if (valida) val_validas.push({ linha: idx+1, placa: p, formato: fmt });
+    else val_invalidas.push({ linha: idx+1, placa: p || linha, motivo: detectaErroPlaca(p || linha) });
+    rows.push({ linha: idx+1, placa: p || linha, valida, fmt });
+  });
+
+  // Estatísticas
+  const statsEl = document.getElementById('val-stats');
+  statsEl.style.display = rows.length ? 'flex' : 'none';
+  statsEl.innerHTML = `
+    <div class="stat-card"><div class="num">${rows.length}</div><div class="lbl">Total</div></div>
+    <div class="stat-card" style="border-color:var(--success)"><div class="num" style="color:var(--success)">${val_validas.length}</div><div class="lbl">Válidas</div></div>
+    <div class="stat-card" style="border-color:var(--danger)"><div class="num" style="color:var(--danger)">${val_invalidas.length}</div><div class="lbl">Inválidas</div></div>
+  `;
+
+  // Renderiza
+  const resEl = document.getElementById('val-results');
+  let html = '';
+  if (val_validas.length) {
+    html += `<div class="group-title g-valid">✔ Válidas (${val_validas.length})</div>`;
+    html += val_validas.map(v => `
+      <div class="valid-item valid-row">
+        <span class="line-num">#${v.linha}</span>
+        <span class="plate-str">${v.placa}</span>
+        <span class="tag green">${v.formato}</span>
+      </div>`).join('');
+  }
+  if (val_invalidas.length) {
+    html += `<div class="group-title g-invalid" style="margin-top:16px">✘ Inválidas (${val_invalidas.length})</div>`;
+    html += val_invalidas.map(v => `
+      <div class="valid-item invalid-row">
+        <span class="line-num">#${v.linha}</span>
+        <span class="plate-str">${v.placa}</span>
+        <span class="reason">${v.motivo}</span>
+      </div>`).join('');
+  }
+  resEl.innerHTML = html;
+
+  document.getElementById('val-btn-xlsx-valid').style.display   = val_validas.length   ? '' : 'none';
+  document.getElementById('val-btn-xlsx-invalid').style.display = val_invalidas.length ? '' : 'none';
+}
+
+function val_limpar() {
+  document.getElementById('val-input').value = '';
+  document.getElementById('val-results').innerHTML = '';
+  document.getElementById('val-stats').style.display = 'none';
+  document.getElementById('val-btn-xlsx-valid').style.display   = 'none';
+  document.getElementById('val-btn-xlsx-invalid').style.display = 'none';
+  val_validas = []; val_invalidas = [];
+}
+
+function val_exportXlsx(tipo) {
+  const data = tipo === 'validas'
+    ? val_validas.map(v => ({ Linha: v.linha, Placa: v.placa, Formato: v.formato }))
+    : val_invalidas.map(v => ({ Linha: v.linha, Placa: v.placa, Motivo: v.motivo }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, tipo);
+  XLSX.writeFile(wb, `placas_${tipo}.xlsx`);
+}
+
+
+/* ==============================================
+   F) APP 3: CONVERSOR JSON → CSV
+   Estratégias de parse:
+   1) JSON.parse direto
+   2) Envolver em array [ ]
+   3) Extração bloco a bloco { }
+   ============================================== */
+let json_csvData  = '';
+let json_placas   = [];
+
+function parseMultiJSON(raw) {
+  // Estratégia 1: parse direto
+  try {
+    const p = JSON.parse(raw);
+    return Array.isArray(p) ? p : [p];
+  } catch {}
+  // Estratégia 2: envolver em array
+  try {
+    const p = JSON.parse('[' + raw + ']');
+    if (Array.isArray(p)) return p;
+  } catch {}
+  // Estratégia 3: extração de blocos {}
+  const objs = [];
+  let depth = 0, start = -1;
+  for (let i = 0; i < raw.length; i++) {
+    if (raw[i] === '{') { if (depth++ === 0) start = i; }
+    else if (raw[i] === '}') {
+      if (--depth === 0 && start !== -1) {
+        try { objs.push(JSON.parse(raw.slice(start, i+1))); } catch {}
+        start = -1;
+      }
+    }
+  }
+  return objs;
+}
+
+function json_csvLine(obj, keys) {
+  return keys.map(k => {
+    const v = obj[k] ?? '';
+    const s = String(v);
+    return (s.includes(';') || s.includes('"') || s.includes('\n'))
+      ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }).join(';');
+}
+
+function converterJSON() {
+  const raw = document.getElementById('json-input').value.trim();
+  if (!raw) return;
+
+  const objs = parseMultiJSON(raw);
+  if (!objs.length) {
+    document.getElementById('json-results').innerHTML =
+      '<div class="result-box error">JSON inválido — verifique a sintaxe.</div>';
+    document.getElementById('json-stats').style.display = 'none';
+    document.getElementById('json-action-row').style.display = 'none';
+    document.getElementById('json-sql-wrap').style.display = 'none';
+    return;
+  }
+
+  // Coletar todas as chaves únicas
+  const keysSet = new Set();
+  objs.forEach(o => Object.keys(o).forEach(k => keysSet.add(k)));
+  const keys = [...keysSet];
+
+  // Montar CSV (UTF-8 BOM para Excel)
+  const bom = '\uFEFF';
+  const header = keys.join(';');
+  const rows = objs.map(o => json_csvLine(o, keys));
+  json_csvData = bom + header + '\r\n' + rows.join('\r\n');
+
+  // Extrair placas (campo placa / Placa / PLACA)
+  json_placas = [...new Set(
+    objs.map(o => o.placa || o.Placa || o.PLACA || '').filter(Boolean).map(p => p.toUpperCase())
+  )];
+
+  // Estatísticas
+  const statsEl = document.getElementById('json-stats');
+  statsEl.style.display = 'flex';
+  statsEl.innerHTML = `
+    <div class="stat-card"><div class="num">${objs.length}</div><div class="lbl">Registros</div></div>
+    <div class="stat-card"><div class="num">${keys.length}</div><div class="lbl">Colunas</div></div>
+    <div class="stat-card"><div class="num">${json_placas.length}</div><div class="lbl">Placas</div></div>
+  `;
+
+  // Preview tabela
+  const preview = objs.slice(0, 8);
+  let table = `<div class="scroll-table preview-table-wrap"><table class="result-table"><thead><tr>`;
+  table += keys.map(k => `<th>${k}</th>`).join('');
+  table += '</tr></thead><tbody>';
+  preview.forEach(o => {
+    table += '<tr>' + keys.map(k => `<td>${o[k] ?? ''}</td>`).join('') + '</tr>';
+  });
+  if (objs.length > 8) table += `<tr><td colspan="${keys.length}" style="color:var(--text3);text-align:center">… mais ${objs.length - 8} registros</td></tr>`;
+  table += '</tbody></table></div>';
+  document.getElementById('json-results').innerHTML = table;
+
+  document.getElementById('json-action-row').style.display = 'flex';
+
+  // SQL
+  if (json_placas.length) {
+    document.getElementById('json-sql-wrap').style.display = 'block';
+    document.getElementById('json-sql-out').textContent = strToSQL(json_placas);
+  }
+}
+
+function json_downloadCSV() {
+  if (!json_csvData) return;
+  const blob = new Blob([json_csvData], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'dados.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+function json_copiarSQL() {
+  if (json_placas.length) copiarTexto(strToSQL(json_placas));
+}
+function json_limpar() {
+  document.getElementById('json-input').value = '';
+  document.getElementById('json-results').innerHTML = '';
+  document.getElementById('json-stats').style.display = 'none';
+  document.getElementById('json-action-row').style.display = 'none';
+  document.getElementById('json-sql-wrap').style.display = 'none';
+  json_csvData = ''; json_placas = [];
+}
+
+
+/* ==============================================
+   G) APP 4: PROCESSADOR DE EXCEL
+   Mapa de colunas alvo:
+   A=placa_Veiculo, B=numero_chassis_veiculo, C=numero_renavam,
+   D=codigo_empresa, E=sigla_UF, F=Situação, G=Tipo consulta,
+   H=Tipo Movimentacao (fixo "Inclusao"), I=dt_situacao,
+   J=cnpj (vazio), K=UF_venda
+   ============================================== */
+let excel_csvData = '';
+let excel_rows    = [];
+
+// Converte serial Excel para DD/MM/YYYY
+function excelDataParaStr(valor) {
+  if (typeof valor === 'number') {
+    const base = new Date(1899, 11, 30);
+    base.setDate(base.getDate() + Math.floor(valor));
+    const d = String(base.getDate()).padStart(2,'0');
+    const m = String(base.getMonth()+1).padStart(2,'0');
+    const y = base.getFullYear();
+    return `${d}/${m}/${y}`;
+  }
+  return valor;
+}
+
+function excel_onFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  excel_processFile(file);
+}
+
+// Drag-and-drop
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', e => { dropZone.classList.remove('drag-over'); });
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) excel_processFile(file);
+});
+
+function excel_processFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'binary', cellDates: false });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+      // Reorganiza colunas
+      excel_rows = raw.map(row => {
+        // Detectar nome de coluna por nome aproximado (case-insensitive)
+        const get = (...keys) => {
+          for (const k of keys) {
+            const found = Object.keys(row).find(rk => rk.toLowerCase().replace(/[_\s]/g,'').includes(k.toLowerCase().replace(/[_\s]/g,'')));
+            if (found !== undefined && row[found] !== '') return row[found];
+          }
+          return '';
+        };
+        const dt = get('dt_situacao','datasituacao','situacaodata');
+        return {
+          placa_Veiculo:           get('placa','placa_veiculo'),
+          numero_chassis_veiculo:  get('chassi','chassis','numero_chassis'),
+          numero_renavam:          get('renavam','numero_renavam'),
+          codigo_empresa:          get('empresa','codigo_empresa','cod_empresa'),
+          sigla_UF:                get('uf','sigla_uf','uf_venda') || get('uf'),
+          Situação:                get('situacao','situação','status'),
+          'Tipo consulta':         get('tipo_consulta','tipoconsulta','tipo consulta'),
+          'Tipo Movimentacao':     'Inclusao',
+          dt_situacao:             dt ? excelDataParaStr(dt) : '',
+          cnpj:                    '',
+          UF_venda:                get('uf_venda','ufvenda'),
+        };
+      });
+
+      // Gerar CSV
+      const headers = Object.keys(excel_rows[0] || {});
+      const bom = '\uFEFF';
+      const csvRows = excel_rows.map(r =>
+        headers.map(h => {
+          const v = String(r[h] ?? '');
+          return (v.includes(';') || v.includes('"') || v.includes('\n'))
+            ? '"' + v.replace(/"/g,'""') + '"' : v;
+        }).join(';')
+      );
+      excel_csvData = bom + headers.join(';') + '\r\n' + csvRows.join('\r\n');
+
+      // Info do arquivo
+      const infoEl = document.getElementById('excel-file-info');
+      infoEl.style.display = 'block';
+      infoEl.innerHTML = `📄 <strong>${file.name}</strong> — ${excel_rows.length} registros processados`;
+
+      // Stats
+      const statsEl = document.getElementById('excel-stats');
+      statsEl.style.display = 'flex';
+      statsEl.innerHTML = `
+        <div class="stat-card"><div class="num">${excel_rows.length}</div><div class="lbl">Registros</div></div>
+        <div class="stat-card"><div class="num">${headers.length}</div><div class="lbl">Colunas</div></div>
+        <div class="stat-card"><div class="num">${wb.SheetNames[0]}</div><div class="lbl">Aba</div></div>
+      `;
+
+      // Preview
+      const preview = excel_rows.slice(0, 10);
+      let table = `<table class="result-table"><thead><tr>`;
+      table += headers.map(h => `<th>${h}</th>`).join('');
+      table += '</tr></thead><tbody>';
+      preview.forEach(r => {
+        table += '<tr>' + headers.map(h => `<td>${r[h] ?? ''}</td>`).join('') + '</tr>';
+      });
+      table += '</tbody></table>';
+      document.getElementById('excel-preview-table').innerHTML = table;
+      document.getElementById('excel-preview').style.display = 'block';
+      document.getElementById('excel-action-row').style.display = 'flex';
+
+    } catch(err) {
+      document.getElementById('excel-file-info').style.display = 'block';
+      document.getElementById('excel-file-info').innerHTML =
+        `<span style="color:var(--danger)">Erro ao ler arquivo: ${err.message}</span>`;
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function excel_downloadCSV() {
+  if (!excel_csvData) return;
+  const blob = new Blob([excel_csvData], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'dados_reorganizados.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function excel_limpar() {
+  document.getElementById('excel-file-info').style.display = 'none';
+  document.getElementById('excel-stats').style.display = 'none';
+  document.getElementById('excel-preview').style.display = 'none';
+  document.getElementById('excel-action-row').style.display = 'none';
+  document.getElementById('excel-file-input').value = '';
+  excel_csvData = ''; excel_rows = [];
+}
+</script>
+</body>
+</html>
