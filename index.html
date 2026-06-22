@@ -442,6 +442,12 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
         Processador Excel
         <span class="nav-dot"></span>
       </button>
+
+      <button class="nav-item" onclick="showPage('sqlin',this)">
+        <span class="nav-icon">🔎</span>
+        Conversor SQL IN
+        <span class="nav-dot"></span>
+      </button>
     </div>
 
     <div class="sidebar-footer">
@@ -504,6 +510,12 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
             <div class="card-icon-box icon-purple">📊</div>
             <h3>Processador Excel</h3>
             <p>Reorganiza colunas de planilhas XLSX para o formato padrão e exporta CSV.</p>
+            <div class="card-cta">Abrir →</div>
+          </div>
+          <div class="home-card" onclick="showPageByName('sqlin')">
+            <div class="card-icon-box icon-orange">🔎</div>
+            <h3>Conversor SQL IN</h3>
+            <p>Converte uma lista de valores em cláusula <code style="background:var(--bg-elevated);padding:1px 5px;border-radius:4px;">IN (...)</code> pronta para uso em queries SQL.</p>
             <div class="card-cta">Abrir →</div>
           </div>
         </div>
@@ -701,6 +713,50 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
       </div>
     </div>
 
+  <!-- ===================================================
+         APP 5 — CONVERSOR SQL IN
+         =================================================== -->
+    <div id="page-sqlin" class="app-page">
+        <div class="app-wrap" style="max-width:620px;">
+        <div class="input-card">
+          <label class="section-label" for="sqlin-ta">Cole os valores aqui</label>
+          <textarea class="input-area" id="sqlin-ta" rows="6"
+            placeholder="TG00420009&#10;TG00395665&#10;TG00123456"
+            spellcheck="false" autocomplete="off"></textarea>
+          <div class="input-hint">
+            Aceita valores separados por quebra de linha &middot;
+            <kbd>Ctrl</kbd>+<kbd>Enter</kbd> para converter
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="sqlin_convert()">Converter</button>
+            <button class="btn" onclick="sqlin_clear()">Limpar</button>
+          </div>
+        </div>
+
+        <!-- estado vazio -->
+        <div class="empty-state" id="sqlin-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
+          <div>Cole seus valores e clique em Converter</div>
+        </div>
+
+        <!-- resultado -->
+        <div id="sqlin-output" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="section-label" style="margin:0;">Resultado SQL</span>
+            <span id="sqlin-badge" style="font-size:11px;background:rgba(255,91,31,.15);color:var(--accent);padding:2px 10px;border-radius:20px;font-weight:600;"></span>
+          </div>
+          <div id="sqlin-box"
+            style="background:var(--bg-surface);border:1px solid var(--border-s);border-radius:var(--r-md);
+                   padding:14px 16px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:13px;
+                   color:var(--text-1);word-break:break-all;white-space:pre-wrap;line-height:1.7;
+                   margin-bottom:12px;"></div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn" id="sqlin-copy-btn" onclick="sqlin_copy()">📋 Copiar</button>
+          </div>
+        </div>
+
   </div><!-- /main -->
 </div><!-- /shell -->
 
@@ -723,7 +779,8 @@ function showPage(id, navBtn) {
     conversor: ['Conversor de Placas','Tradicional ↔ Mercosul'],
     validador: ['Validador de Placas','em lote'],
     jsoncsv:   ['JSON → CSV','Converter e exportar'],
-    excel:     ['Processador Excel','Reorganizar e exportar CSV']
+    excel:     ['Processador Excel','Reorganizar e exportar CSV'],
+    sqlin:     ['Conversor SQL IN','Lista → cláusula IN']
   };
   const [t, s] = titles[id] || ['',''];
   document.getElementById('topbarTitle').textContent = t;
@@ -1273,6 +1330,58 @@ function val_baixar(tipo){
   };
 
   mostrarStatus('info','ℹ️ Pronto para processar. Selecione um arquivo Excel para começar.');
+})();
+
+/* ============================================================
+   APP 5 — CONVERSOR SQL IN
+   ============================================================ */
+(function(){
+  let lastRaw = '';
+
+  function getLines(){
+    return document.getElementById('sqlin-ta').value
+      .split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+  }
+
+  window.sqlin_convert = function(){
+    const lines = getLines();
+    const emptyEl  = document.getElementById('sqlin-empty');
+    const outputEl = document.getElementById('sqlin-output');
+    const boxEl    = document.getElementById('sqlin-box');
+    const badgeEl  = document.getElementById('sqlin-badge');
+    if(!lines.length){
+      emptyEl.style.display='flex'; outputEl.style.display='none'; return;
+    }
+    lastRaw = 'in ('+lines.map(l=>"'"+l.replace(/'/g,"''")+"'").join(', ')+')';
+    // highlight syntax
+    const parts = lines.map(l=>`<span style="color:var(--ok)">'${l}'</span>`).join('<span style="color:var(--text-3)">, </span>');
+    boxEl.innerHTML = `<span style="color:var(--accent);font-weight:600;">in</span> <span style="color:var(--text-2)">(</span>${parts}<span style="color:var(--text-2)">)</span>`;
+    badgeEl.textContent = lines.length+(lines.length===1?' item':' itens');
+    emptyEl.style.display='none'; outputEl.style.display='block';
+  };
+
+  window.sqlin_clear = function(){
+    document.getElementById('sqlin-ta').value='';
+    document.getElementById('sqlin-empty').style.display='flex';
+    document.getElementById('sqlin-output').style.display='none';
+    lastRaw='';
+  };
+
+  window.sqlin_copy = function(){
+    if(!lastRaw) return;
+    const btn = document.getElementById('sqlin-copy-btn');
+    navigator.clipboard.writeText(lastRaw).then(()=>{
+      btn.textContent='✓ Copiado!';
+      setTimeout(()=>{ btn.innerHTML='📋 Copiar'; },1800);
+    }).catch(()=>{ btn.textContent='Erro ao copiar'; });
+  };
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    const ta = document.getElementById('sqlin-ta');
+    if(ta) ta.addEventListener('keydown',(e)=>{
+      if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();window.sqlin_convert();}
+    });
+  });
 })();
 </script>
 </body>
