@@ -393,6 +393,27 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
   .json-stats{grid-template-columns:repeat(3,1fr);}
   .exc-details{grid-template-columns:1fr;}
 }
+
+/* Frota — dots do pipeline */
+.frota-dot{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--bg-elevated);border:1px solid var(--border-m);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--text-3);transition:all .3s ease;
+}
+.frota-dot.active{border-color:var(--accent);color:var(--accent);background:rgba(255,91,31,.1);}
+.frota-dot.done{border-color:var(--ok);color:var(--ok);background:var(--ok-soft);}
+
+/* Frota — slots de upload */
+.frota-slot{
+  border:1.5px dashed var(--border-m);border-radius:var(--r-md);
+  padding:16px 10px;text-align:center;min-height:100px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:6px;cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.frota-slot:hover{border-color:var(--accent);}
+.frota-slot.filled{border-style:solid;border-color:var(--ok);background:var(--ok-soft);cursor:default;}
 </style>
 </head>
 <body>
@@ -446,6 +467,12 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
       <button class="nav-item" onclick="showPage('sqlin',this)">
         <span class="nav-icon">🔎</span>
         Conversor SQL IN
+        <span class="nav-dot"></span>
+      </button>
+
+      <button class="nav-item" onclick="showPage('frota',this)">
+        <span class="nav-icon">🚗</span>
+        Unificador de Frota
         <span class="nav-dot"></span>
       </button>
     </div>
@@ -516,6 +543,12 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
             <div class="card-icon-box icon-orange">🔎</div>
             <h3>Conversor SQL IN</h3>
             <p>Converte uma lista de valores em cláusula <code style="background:var(--bg-elevated);padding:1px 5px;border-radius:4px;">IN (...)</code> pronta para uso em queries SQL.</p>
+            <div class="card-cta">Abrir →</div>
+          </div>
+          <div class="home-card" onclick="showPageByName('frota')">
+            <div class="card-icon-box icon-green">🚗</div>
+            <h3>Unificador de Frota</h3>
+            <p>Une até 3 planilhas Excel de restrição/localização em um único CSV padronizado com colunas validadas.</p>
             <div class="card-cta">Abrir →</div>
           </div>
         </div>
@@ -760,6 +793,99 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
   </div><!-- /main -->
 </div><!-- /shell -->
 
+    <!-- ===================================================
+         APP 6 — UNIFICADOR DE FROTA
+         =================================================== -->
+    <div id="page-frota" class="app-page">
+      <div class="app-wrap" style="max-width:780px; padding-top:8px;">
+
+        <div class="input-card" style="margin-bottom:18px;">
+          <p style="font-size:13px;color:var(--text-2);margin-bottom:18px;">
+            Envie 3 planilhas Excel de restrição/localização. O app valida as colunas, une e gera um CSV padronizado.
+          </p>
+
+          <!-- pipeline visual -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:22px;padding:14px 16px;background:var(--bg-elevated);border:1px solid var(--border-s);border-radius:var(--r-md);">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+              <div id="frota-dot-1" class="frota-dot">1</div>
+              <div style="font-size:10px;color:var(--text-3);">Arquivo A</div>
+            </div>
+            <div style="height:1px;flex:0.5;background:var(--border-s);margin-bottom:14px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+              <div id="frota-dot-2" class="frota-dot">2</div>
+              <div style="font-size:10px;color:var(--text-3);">Arquivo B</div>
+            </div>
+            <div style="height:1px;flex:0.5;background:var(--border-s);margin-bottom:14px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+              <div id="frota-dot-3" class="frota-dot">3</div>
+              <div style="font-size:10px;color:var(--text-3);">Arquivo C</div>
+            </div>
+            <div style="height:1px;flex:0.5;background:var(--border-s);margin-bottom:14px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+              <div id="frota-dot-merge" class="frota-dot">⧉</div>
+              <div style="font-size:10px;color:var(--text-3);">Unificar</div>
+            </div>
+            <div style="height:1px;flex:0.5;background:var(--border-s);margin-bottom:14px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+              <div id="frota-dot-csv" class="frota-dot">↓</div>
+              <div style="font-size:10px;color:var(--text-3);">CSV</div>
+            </div>
+          </div>
+
+          <!-- slots de upload -->
+          <div id="frota-slots" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+            <div class="frota-slot" data-slot="0" onclick="frota_triggerPick(0)">
+              <div style="font-size:10px;color:var(--text-3);font-weight:600;">ARQUIVO 1</div>
+              <div style="font-size:20px;">📄</div>
+              <div style="font-size:11px;color:var(--text-2);">Clique ou arraste</div>
+            </div>
+            <div class="frota-slot" data-slot="1" onclick="frota_triggerPick(1)">
+              <div style="font-size:10px;color:var(--text-3);font-weight:600;">ARQUIVO 2</div>
+              <div style="font-size:20px;">📄</div>
+              <div style="font-size:11px;color:var(--text-2);">Clique ou arraste</div>
+            </div>
+            <div class="frota-slot" data-slot="2" onclick="frota_triggerPick(2)">
+              <div style="font-size:10px;color:var(--text-3);font-weight:600;">ARQUIVO 3</div>
+              <div style="font-size:20px;">📄</div>
+              <div style="font-size:11px;color:var(--text-2);">Clique ou arraste</div>
+            </div>
+          </div>
+
+          <div id="frota-dz-hint" style="text-align:center;color:var(--text-3);font-size:12px;margin-bottom:16px;">
+            Arraste até 3 arquivos .xlsx/.xls sobre os quadros acima, ou clique em cada um
+          </div>
+
+          <input type="file" id="frota-file-input" accept=".xlsx,.xls" multiple style="display:none;">
+
+          <div class="btn-row">
+            <button class="btn btn-primary" id="frota-process-btn" disabled onclick="frota_processar()">Processar e Unificar</button>
+            <button class="btn" onclick="frota_resetTudo()">Limpar</button>
+          </div>
+
+          <!-- barra de progresso -->
+          <div id="frota-progress-wrap" style="display:none;margin-top:16px;">
+            <div style="height:6px;border-radius:4px;background:var(--bg-elevated);border:1px solid var(--border-s);overflow:hidden;">
+              <div id="frota-progress-fill" style="height:100%;width:0%;background:var(--accent);border-radius:4px;transition:width .4s ease;"></div>
+            </div>
+            <div id="frota-progress-step" style="font-size:11px;color:var(--text-3);margin-top:6px;text-align:center;">—</div>
+          </div>
+
+          <!-- alerta de erro -->
+          <div id="frota-alert" style="display:none;margin-top:14px;padding:12px 14px;border-radius:var(--r-md);background:var(--err-soft);border:1px solid var(--err);color:var(--err);font-size:13px;line-height:1.5;"></div>
+
+          <!-- resultado -->
+          <div id="frota-result" style="display:none;margin-top:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg-elevated);border:1px solid var(--border-s);border-radius:var(--r-md);margin-bottom:12px;font-size:13px;">
+              <span style="color:var(--text-2);">Linhas unificadas</span>
+              <strong id="frota-stat-rows" style="color:var(--accent);">0</strong>
+            </div>
+            <button class="btn btn-primary" onclick="frota_baixarCSV()" style="width:100%;background:var(--ok);border-color:var(--ok);">⬇ Baixar CSV Unificado</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
 <!-- ============================================================
      JAVASCRIPT
      ============================================================ -->
@@ -780,7 +906,8 @@ function showPage(id, navBtn) {
     validador: ['Validador de Placas','em lote'],
     jsoncsv:   ['JSON → CSV','Converter e exportar'],
     excel:     ['Processador Excel','Reorganizar e exportar CSV'],
-    sqlin:     ['Conversor SQL IN','Lista → cláusula IN']
+    sqlin:     ['Conversor SQL IN','Lista → cláusula IN'],
+    frota:     ['Unificador de Frota','3 planilhas → 1 CSV']
   };
   const [t, s] = titles[id] || ['',''];
   document.getElementById('topbarTitle').textContent = t;
@@ -1382,6 +1509,237 @@ function val_baixar(tipo){
       if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();window.sqlin_convert();}
     });
   });
+})();
+
+/* ============================================================
+   APP 6 — UNIFICADOR DE FROTA
+   ============================================================ */
+(function(){
+  let frota_slotFiles=[null,null,null];
+  let frota_csvBlob=null;
+  let frota_csvFilename='';
+
+  const COLUMN_MAP={
+    'PLACA':'placa','RENAVAM':'renavam','CHASSI':'chassi',
+    'UF EMPLACAMENTO':'uf','STATUS LOCALIZA':'status_localiza',
+    'DATA CADASTRO':'data_cadastro_localiza','FROTA':'frota'
+  };
+  const OUTPUT_ORDER=['placa','renavam','chassi','uf','status_localiza','data_cadastro_localiza','frota','data_atualizacao'];
+
+  function normalizeHeader(h){
+    return String(h||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toUpperCase().trim().replace(/\s+/g,' ');
+  }
+  function escHtml(str){const d=document.createElement('div');d.textContent=str;return d.innerHTML;}
+  function normalizarRenavam(v){const d=String(v==null?'':v).replace(/\D/g,'');return d===''?'':d.padStart(11,'0');}
+  function dataAtual(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;}
+  function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+
+  function frota_showAlert(html){const b=document.getElementById('frota-alert');b.innerHTML=html;b.style.display='block';}
+  function frota_hideAlert(){document.getElementById('frota-alert').style.display='none';}
+  function frota_setProgress(pct,label){
+    document.getElementById('frota-progress-wrap').style.display='block';
+    document.getElementById('frota-progress-fill').style.width=pct+'%';
+    document.getElementById('frota-progress-step').textContent=label;
+  }
+  function frota_dot(id,cls){
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.classList.remove('active','done');
+    if(cls) el.classList.add(cls);
+  }
+
+  window.frota_triggerPick=function(idx){
+    const fi=document.getElementById('frota-file-input');
+    fi._slot=idx; fi.value=''; fi.click();
+  };
+
+  document.addEventListener('DOMContentLoaded',function(){
+    const fi=document.getElementById('frota-file-input');
+    if(!fi) return;
+    fi.addEventListener('change',function(e){
+      const files=Array.from(e.target.files||[]);
+      if(!files.length) return;
+      if(files.length===1&&this._slot!=null) frota_assignSlot(this._slot,files[0]);
+      else frota_distributeFiles(files);
+      this._slot=null;
+    });
+    const slotsEl=document.getElementById('frota-slots');
+    const dzHint=document.getElementById('frota-dz-hint');
+    if(slotsEl){
+      ['dragenter','dragover'].forEach(ev=>slotsEl.addEventListener(ev,e=>{
+        e.preventDefault();e.stopPropagation();
+        if(dzHint) dzHint.style.color='var(--accent)';
+      }));
+      ['dragleave','drop'].forEach(ev=>slotsEl.addEventListener(ev,e=>{
+        e.preventDefault();e.stopPropagation();
+        if(dzHint) dzHint.style.color='var(--text-3)';
+        if(ev==='drop') frota_distributeFiles(Array.from(e.dataTransfer.files||[]));
+      }));
+    }
+  });
+
+  function frota_distributeFiles(files){
+    let idx=0;
+    for(const f of files){
+      while(idx<3&&frota_slotFiles[idx]!==null) idx++;
+      if(idx>=3) break;
+      frota_assignSlot(idx,f); idx++;
+    }
+  }
+
+  function frota_assignSlot(idx,file){
+    if(!/\.(xlsx|xls)$/i.test(file.name)){
+      frota_showAlert(`O arquivo <b>${escHtml(file.name)}</b> não é um Excel válido (.xlsx ou .xls).`);
+      return;
+    }
+    frota_slotFiles[idx]=file;
+    frota_renderSlot(idx);
+    frota_updateBtn();
+    frota_hideAlert();
+  }
+
+  window.frota_removeSlot=function(idx,e){
+    if(e) e.stopPropagation();
+    frota_slotFiles[idx]=null;
+    frota_renderSlot(idx);
+    frota_updateBtn();
+    frota_resetResultado();
+  };
+
+  function frota_renderSlot(idx){
+    const el=document.querySelector(`.frota-slot[data-slot="${idx}"]`);
+    if(!el) return;
+    const file=frota_slotFiles[idx];
+    if(file){
+      el.classList.add('filled');
+      el.removeAttribute('onclick');
+      el.innerHTML=`
+        <div style="font-size:10px;color:var(--text-3);font-weight:600;">ARQUIVO ${idx+1}</div>
+        <div style="font-size:20px;">✅</div>
+        <div style="font-size:11px;color:var(--text-1);word-break:break-all;">${escHtml(file.name)}</div>
+        <div onclick="frota_removeSlot(${idx},event)" style="font-size:10px;color:var(--text-3);text-decoration:underline;cursor:pointer;margin-top:2px;">remover</div>`;
+    } else {
+      el.classList.remove('filled');
+      el.setAttribute('onclick',`frota_triggerPick(${idx})`);
+      el.innerHTML=`
+        <div style="font-size:10px;color:var(--text-3);font-weight:600;">ARQUIVO ${idx+1}</div>
+        <div style="font-size:20px;">📄</div>
+        <div style="font-size:11px;color:var(--text-2);">Clique ou arraste</div>`;
+    }
+  }
+
+  function frota_updateBtn(){
+    const ok=frota_slotFiles.every(f=>f!==null);
+    const btn=document.getElementById('frota-process-btn');
+    if(btn) btn.disabled=!ok;
+    [1,2,3].forEach(i=>frota_dot(`frota-dot-${i}`,frota_slotFiles[i-1]?'done':null));
+  }
+
+  function frota_resetResultado(){
+    frota_csvBlob=null;
+    const r=document.getElementById('frota-result');
+    const p=document.getElementById('frota-progress-wrap');
+    const f=document.getElementById('frota-progress-fill');
+    if(r) r.style.display='none';
+    if(p) p.style.display='none';
+    if(f) f.style.width='0%';
+    frota_dot('frota-dot-merge',null);
+    frota_dot('frota-dot-csv',null);
+  }
+
+  window.frota_resetTudo=function(){
+    frota_slotFiles=[null,null,null];
+    [0,1,2].forEach(i=>frota_renderSlot(i));
+    frota_updateBtn();
+    frota_resetResultado();
+    frota_hideAlert();
+  };
+
+  function frota_lerExcel(file){
+    return new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=e=>{
+        try{
+          const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+          res(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'',raw:false}));
+        }catch(err){rej(new Error(`Não foi possível ler "${file.name}".`));}
+      };
+      r.onerror=()=>rej(new Error(`Falha ao carregar "${file.name}".`));
+      r.readAsArrayBuffer(file);
+    });
+  }
+
+  function frota_validarExtrair(rows,fileName){
+    if(!rows.length) throw new Error(`"${fileName}" está vazio.`);
+    const norm={};
+    Object.keys(rows[0]).forEach(k=>{norm[normalizeHeader(k)]=k;});
+    const faltando=Object.keys(COLUMN_MAP).filter(h=>!(h in norm));
+    if(faltando.length) throw new Error(`"${fileName}" sem coluna(s): ${faltando.join(', ')}.`);
+    return rows.map(row=>{
+      const out={};
+      Object.keys(COLUMN_MAP).forEach(h=>{
+        const v=String(row[norm[h]]??'').trim();
+        out[COLUMN_MAP[h]]=COLUMN_MAP[h]==='renavam'?normalizarRenavam(v):v;
+      });
+      return out;
+    });
+  }
+
+  function frota_gerarCSV(rows){
+    const sep=';';
+    const esc=v=>{let s=String(v??'');if(s.includes(sep)||s.includes('"')||s.includes('\n'))s='"'+s.replace(/"/g,'""')+'"';return s;};
+    return '\uFEFF'+[OUTPUT_ORDER.join(sep),...rows.map(r=>OUTPUT_ORDER.map(c=>esc(r[c])).join(sep))].join('\r\n');
+  }
+
+  window.frota_processar=async function(){
+    frota_hideAlert();
+    frota_resetResultado();
+    const btn=document.getElementById('frota-process-btn');
+    if(btn) btn.disabled=true;
+    try{
+      let unified=[];
+      for(let i=0;i<3;i++){
+        frota_dot(`frota-dot-${i+1}`,'active');
+        frota_setProgress(Math.round((i/3)*55),`Lendo arquivo ${['A','B','C'][i]}...`);
+        await wait(200);
+        const rows=await frota_lerExcel(frota_slotFiles[i]);
+        unified=unified.concat(frota_validarExtrair(rows,frota_slotFiles[i].name));
+        frota_dot(`frota-dot-${i+1}`,'done');
+      }
+      frota_dot('frota-dot-merge','active');
+      frota_setProgress(65,`Unificando ${unified.length} linhas...`);
+      await wait(300);
+      const hoje=dataAtual();
+      unified.forEach(r=>r.data_atualizacao=hoje);
+      frota_dot('frota-dot-merge','done');
+      frota_dot('frota-dot-csv','active');
+      frota_setProgress(95,'Gerando CSV...');
+      await wait(250);
+      const csvStr=frota_gerarCSV(unified);
+      frota_csvBlob=new Blob([csvStr],{type:'text/csv;charset=utf-8;'});
+      frota_csvFilename=`frota_unificada_${hoje}.csv`;
+      frota_setProgress(100,'Concluído.');
+      frota_dot('frota-dot-csv','done');
+      const stat=document.getElementById('frota-stat-rows');
+      const res=document.getElementById('frota-result');
+      if(stat) stat.textContent=unified.length;
+      if(res) res.style.display='block';
+    }catch(err){
+      frota_resetResultado();
+      frota_showAlert(`<strong>Erro:</strong> ${escHtml(err.message)}`);
+    }finally{
+      if(btn) btn.disabled=!frota_slotFiles.every(f=>f!==null);
+    }
+  };
+
+  window.frota_baixarCSV=function(){
+    if(!frota_csvBlob) return;
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(frota_csvBlob);
+    a.download=frota_csvFilename||'frota_unificada.csv';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+  };
 })();
 </script>
 </body>
