@@ -414,6 +414,49 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
 }
 .frota-slot:hover{border-color:var(--accent);}
 .frota-slot.filled{border-style:solid;border-color:var(--ok);background:var(--ok-soft);cursor:default;}
+
+/* --- CONSOLIDADOR DE ARQUIVOS --- */
+#page-consolidador .cons-drop{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  border:1.5px dashed var(--border-m);border-radius:var(--r-md);
+  padding:32px 20px;text-align:center;cursor:pointer;
+  transition:border-color .15s,background .15s,color .15s;
+  color:var(--text-2);background:var(--bg-elevated);
+}
+#page-consolidador .cons-drop:hover,
+#page-consolidador .cons-drop.over{border-color:var(--accent);color:var(--text-1);background:rgba(255,91,31,.06);}
+#page-consolidador .cons-drop svg{width:34px;height:34px;stroke:var(--accent);stroke-width:1.6;fill:none;margin-bottom:4px;}
+#page-consolidador .cons-drop .up-main{font-size:15px;}
+#page-consolidador .cons-drop strong{color:var(--accent);}
+#page-consolidador input[type=file]{display:none;}
+#page-consolidador table{width:100%;border-collapse:collapse;font-size:13.5px;}
+#page-consolidador th,#page-consolidador td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border-s);}
+#page-consolidador th{color:var(--text-3);font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+#page-consolidador tr.bad td{background:rgba(248,113,113,.10);}
+#page-consolidador tr.err td{background:rgba(248,113,113,.16);color:var(--err);}
+#page-consolidador td.action{text-align:right;}
+#page-consolidador code{
+  font-family:"SF Mono",Menlo,Consolas,monospace;font-size:12.5px;
+  color:var(--accent);background:var(--bg-elevated);padding:2px 6px;border-radius:var(--r-sm);
+}
+.cons-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:600;}
+.cons-badge.ok{background:var(--ok-soft);color:var(--ok);}
+.cons-badge.bad{background:var(--err-soft);color:var(--err);}
+.cons-alert{border-radius:var(--r-md);padding:12px 14px;font-size:13px;margin-bottom:12px;}
+.cons-alert.ok{background:var(--ok-soft);color:var(--ok);border:1px solid rgba(74,222,128,.3);}
+.cons-alert.err{background:var(--err-soft);color:var(--err);border:1px solid rgba(248,113,113,.3);}
+.cons-btn-remove{
+  background:transparent;border:1px solid var(--border-m);color:var(--text-2);
+  border-radius:var(--r-sm);padding:3px 9px;font-size:11.5px;cursor:pointer;
+  transition:border-color .15s,color .15s;white-space:nowrap;
+}
+.cons-btn-remove:hover{border-color:var(--err);color:var(--err);}
+#page-consolidador select,#page-consolidador input[type=text]{
+  background:var(--bg-elevated);color:var(--text-1);
+  border:1px solid var(--border-m);border-radius:var(--r-md);
+  padding:9px 12px;font-size:13px;font-family:inherit;
+}
+#page-consolidador .cons-hint{color:var(--text-3);font-size:12px;margin-top:8px;}
 </style>
 </head>
 <body>
@@ -472,7 +515,13 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
 
       <button class="nav-item" onclick="showPage('frota',this)">
         <span class="nav-icon">🚗</span>
-        Unificador de Frota
+        Unificador de Frota - Impedimento
+        <span class="nav-dot"></span>
+      </button>
+
+      <button class="nav-item" onclick="showPage('consolidador',this)">
+        <span class="nav-icon">🧩</span>
+        Consolidador de Arquivos
         <span class="nav-dot"></span>
       </button>
     </div>
@@ -547,8 +596,14 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
           </div>
           <div class="home-card" onclick="showPageByName('frota')">
             <div class="card-icon-box icon-green">🚗</div>
-            <h3>Unificador de Frota</h3>
+            <h3>Unificador de Frota - Impedimento</h3>
             <p>Une até 3 planilhas Excel de restrição/localização em um único CSV padronizado com colunas validadas.</p>
+            <div class="card-cta">Abrir →</div>
+          </div>
+          <div class="home-card" onclick="showPageByName('consolidador')">
+            <div class="card-icon-box icon-blue">🧩</div>
+            <h3>Consolidador de Arquivos</h3>
+            <p>Une múltiplos .txt, .csv e .xlsx em um único conjunto, com validação de estrutura e sugestão de VARCHAR.</p>
             <div class="card-cta">Abrir →</div>
           </div>
         </div>
@@ -794,7 +849,7 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
 </div><!-- /shell -->
 
     <!-- ===================================================
-         APP 6 — UNIFICADOR DE FROTA
+         APP 6 — UNIFICADOR DE FROTA IMPEDIMENTO
          =================================================== -->
     <div id="page-frota" class="app-page">
       <div class="app-wrap" style="max-width:780px; padding-top:8px;">
@@ -886,6 +941,67 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
       </div>
     </div>
 
+    <!-- ===================================================
+         APP 7 — CONSOLIDADOR DE ARQUIVOS
+         =================================================== -->
+    <div id="page-consolidador" class="app-page">
+      <div class="app-wrap" style="max-width:820px;">
+
+        <!-- 1 · UPLOAD -->
+        <div class="input-card">
+          <span class="section-label">1 · Selecionar arquivos</span>
+          <div class="cons-drop" id="cons-drop">
+            <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5l5 5"/><path d="M4 17v2a1 1 0 001 1h14a1 1 0 001-1v-2"/></svg>
+            <span class="up-main">Arraste ou <strong>clique para escolher</strong> arquivos</span>
+            <span class="cons-hint" style="margin-top:0;">.txt · .csv · .xlsx — múltiplos permitidos</span>
+          </div>
+          <input type="file" id="cons-file-input" multiple accept=".txt,.csv,.xlsx">
+          <div class="btn-row" id="cons-clear-row" style="display:none;">
+            <button class="btn" onclick="cons_limparTudo()">🗑 Limpar todos os arquivos</button>
+          </div>
+        </div>
+
+        <!-- 2 · RELATÓRIO + VALIDAÇÃO -->
+        <div class="input-card" id="cons-report-card" style="display:none;">
+          <span class="section-label">2 · Metadados e validação</span>
+          <div id="cons-alert-box"></div>
+          <table>
+            <thead><tr><th>Arquivo</th><th>Linhas</th><th>Colunas</th><th>Status</th><th></th></tr></thead>
+            <tbody id="cons-report-body"></tbody>
+          </table>
+        </div>
+
+        <!-- TAMANHO MÁXIMO POR COLUNA -->
+        <div class="input-card" id="cons-width-card" style="display:none;">
+          <span class="section-label">Tamanho máximo por coluna</span>
+          <label style="font-size:12.5px;color:var(--text-2);display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+            <input type="checkbox" id="cons-has-header" onchange="cons_render()"> 1ª linha é cabeçalho
+          </label>
+          <table>
+            <thead><tr><th>#</th><th>Coluna</th><th>Máx. caracteres</th><th>Sugestão SQL</th></tr></thead>
+            <tbody id="cons-width-body"></tbody>
+          </table>
+          <p class="cons-hint">Comprimento máximo de caractere entre todos os arquivos compatíveis. Use para dimensionar o campo no banco.</p>
+        </div>
+
+        <!-- 3 · EXPORTAÇÃO -->
+        <div class="input-card" id="cons-export-card" style="display:none;">
+          <span class="section-label">3 · Exportar consolidado</span>
+          <input type="text" id="cons-fname" placeholder="Nome do arquivo (opcional)" style="width:100%;margin-bottom:12px;">
+          <div class="btn-row" style="margin-top:0;align-items:center;">
+            <select id="cons-fmt">
+              <option value="csv">CSV</option>
+              <option value="xlsx">Excel (.xlsx)</option>
+              <option value="txt">TXT (tab)</option>
+            </select>
+            <button class="btn btn-primary" onclick="cons_exportar()">Baixar arquivo</button>
+            <span class="cons-hint" id="cons-export-hint" style="margin-top:0;"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
 <!-- ============================================================
      JAVASCRIPT
      ============================================================ -->
@@ -907,7 +1023,8 @@ function showPage(id, navBtn) {
     jsoncsv:   ['JSON → CSV','Converter e exportar'],
     excel:     ['Processador Excel','Reorganizar e exportar CSV'],
     sqlin:     ['Conversor SQL IN','Lista → cláusula IN'],
-    frota:     ['Unificador de Frota','3 planilhas → 1 CSV']
+    frota:     ['Unificador de Frota Impedimento','3 planilhas → 1 CSV'],
+    consolidador: ['Consolidador de Arquivos','txt · csv · xlsx → 1 arquivo']
   };
   const [t, s] = titles[id] || ['',''];
   document.getElementById('topbarTitle').textContent = t;
@@ -1512,7 +1629,7 @@ function val_baixar(tipo){
 })();
 
 /* ============================================================
-   APP 6 — UNIFICADOR DE FROTA
+   APP 6 — UNIFICADOR DE FROTA IMPEDIMENTO
    ============================================================ */
 (function(){
   let frota_slotFiles=[null,null,null];
@@ -1740,6 +1857,239 @@ function val_baixar(tipo){
     a.download=frota_csvFilename||'frota_unificada.csv';
     document.body.appendChild(a);a.click();document.body.removeChild(a);
   };
+})();
+
+/* ============================================================
+   APP 7 — CONSOLIDADOR DE ARQUIVOS
+   Une múltiplos .txt/.csv/.xlsx em um único conjunto de dados.
+   ============================================================ */
+(function(){
+  /* parsed[]: { name, rows(matriz 2D), ncols, nrows, error } */
+  let parsed = [];
+
+  const input = document.getElementById('cons-file-input');
+  const drop  = document.getElementById('cons-drop');
+
+  drop.addEventListener('click', ()=>input.click());
+  input.addEventListener('change', e=>{ handleFiles(e.target.files); input.value=''; });
+  drop.addEventListener('dragover',  e=>{ e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', e=>{ e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', e=>{
+    e.preventDefault(); drop.classList.remove('over');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  /* Lê todos os arquivos, monta a matriz de cada um e dispara o relatório. */
+  async function handleFiles(fileList){
+    const arr=[...fileList];
+    if(!arr.length) return;
+    parsed = [];
+    for(const f of arr){
+      try{
+        const rows = await readFile(f);
+        if(!rows || rows.length===0 || (rows.length===1 && rows[0].every(c=>c===''))){
+          parsed.push({name:f.name, error:'Vazio ou sem dados'});
+        }else{
+          parsed.push({name:f.name, rows, nrows:rows.length, ncols:maxCols(rows)});
+        }
+      }catch(err){
+        parsed.push({name:f.name, error:'Corrompido: '+err.message});
+      }
+    }
+    render();
+  }
+
+  /* Lê 1 arquivo conforme a extensão -> matriz 2D */
+  function readFile(file){
+    const ext=file.name.split('.').pop().toLowerCase();
+    return new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onerror=()=>reject(new Error('falha de leitura'));
+      if(ext==='xlsx'){
+        reader.onload=e=>{
+          try{
+            const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+            const ws=wb.Sheets[wb.SheetNames[0]];
+            resolve(XLSX.utils.sheet_to_json(ws,{header:1,defval:'',blankrows:false}));
+          }catch(err){reject(err);}
+        };
+        reader.readAsArrayBuffer(file);
+      }else{
+        reader.onload=e=>{
+          try{ resolve(parseText(e.target.result)); }
+          catch(err){reject(err);}
+        };
+        reader.readAsText(file);
+      }
+    });
+  }
+
+  /* Parser CSV/TXT: detecta o separador (; , ou tab) pela 1ª linha com conteúdo. */
+  function parseText(text){
+    const lines=text.replace(/\r/g,'').split('\n').filter(l=>l.length>0);
+    if(!lines.length) return [];
+    const sample=lines[0];
+    const sep = sample.includes('\t')?'\t' : (sample.split(';').length>sample.split(',').length?';':',');
+    return lines.map(line=>splitLine(line,sep));
+  }
+  function splitLine(line,sep){
+    const out=[]; let cur=''; let q=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){ q=!q; }
+      else if(c===sep && !q){ out.push(cur); cur=''; }
+      else cur+=c;
+    }
+    out.push(cur);
+    return out.map(v=>v.trim());
+  }
+
+  function maxCols(rows){ return rows.reduce((m,r)=>Math.max(m,r.length),0); }
+
+  /* Maior length por coluna — útil para dimensionar VARCHAR(n). */
+  function calcColWidths(rows, skipHeader){
+    const start = skipHeader ? 1 : 0;
+    const ncols = maxCols(rows);
+    const widths = new Array(ncols).fill(0);
+    for(let i=start;i<rows.length;i++){
+      const r=rows[i];
+      for(let c=0;c<ncols;c++){
+        const len = r[c]==null ? 0 : String(r[c]).length;
+        if(len>widths[c]) widths[c]=len;
+      }
+    }
+    return widths;
+  }
+
+  /* Relatório + validação de estrutura */
+  function render(){
+    const body=document.getElementById('cons-report-body');
+    const alertBox=document.getElementById('cons-alert-box');
+    body.innerHTML='';
+
+    const valid = parsed.filter(p=>!p.error);
+    const refCols = valid.length ? valid[0].ncols : null;
+
+    parsed.forEach((p,i)=>{
+      const tr=document.createElement('tr');
+      const rm=`<td class="action"><button class="cons-btn-remove" onclick="cons_removerArquivo(${i})">✕ Remover</button></td>`;
+      if(p.error){
+        tr.className='err';
+        tr.innerHTML=`<td>${esc(p.name)}</td><td>—</td><td>—</td>
+          <td><span class="cons-badge bad">${esc(p.error)}</span></td>${rm}`;
+      }else{
+        const diverge = p.ncols!==refCols;
+        if(diverge) tr.className='bad';
+        tr.innerHTML=`<td>${esc(p.name)}</td><td>${p.nrows}</td><td>${p.ncols}</td>
+          <td><span class="cons-badge ${diverge?'bad':'ok'}">${diverge?'divergente':'ok'}</span></td>${rm}`;
+      }
+      body.appendChild(tr);
+    });
+
+    document.getElementById('cons-report-card').style.display='block';
+    document.getElementById('cons-clear-row').style.display='flex';
+
+    const diverging = valid.filter(p=>p.ncols!==refCols);
+    const errored = parsed.filter(p=>p.error);
+    let msgs=[];
+    if(errored.length) msgs.push(`<div class="cons-alert err">${errored.length} arquivo(s) com erro serão ignorados.</div>`);
+    if(diverging.length && valid.length)
+      msgs.push(`<div class="cons-alert err">Estrutura divergente: esperado ${refCols} coluna(s). ${diverging.length} arquivo(s) fora do padrão (destacados).</div>`);
+    if(valid.length && !diverging.length)
+      msgs.push(`<div class="cons-alert ok">Todos os ${valid.length} arquivo(s) válidos têm ${refCols} coluna(s). Prontos para consolidar.</div>`);
+    alertBox.innerHTML=msgs.join('');
+
+    const compat = valid.filter(p=>p.ncols===refCols);
+    document.getElementById('cons-export-card').style.display = compat.length ? 'block' : 'none';
+    document.getElementById('cons-export-hint').textContent =
+      compat.length ? `${compat.length} arquivo(s) serão unidos.` : '';
+
+    renderWidths(compat);
+  }
+
+  /* Tabela de tamanho máximo por coluna */
+  function renderWidths(compat){
+    const card=document.getElementById('cons-width-card');
+    const wbody=document.getElementById('cons-width-body');
+    if(!compat.length){ card.style.display='none'; return; }
+
+    let all=[];
+    compat.forEach(p=>{ all=all.concat(p.rows); });
+
+    const skipHeader=document.getElementById('cons-has-header').checked;
+    const widths=calcColWidths(all, skipHeader);
+    const header = skipHeader ? all[0] : null;
+
+    wbody.innerHTML='';
+    widths.forEach((w,c)=>{
+      const nome = header && header[c] ? esc(header[c]) : `Coluna ${c+1}`;
+      const sug = w===0 ? 'VARCHAR(1)' : `VARCHAR(${Math.max(1,Math.ceil(w*1.2))})`;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${c+1}</td><td>${nome}</td><td>${w}</td><td><code>${sug}</code></td>`;
+      wbody.appendChild(tr);
+    });
+    card.style.display='block';
+  }
+
+  window.cons_render = render;
+
+  window.cons_limparTudo = function(){
+    parsed=[];
+    ['cons-report-card','cons-width-card','cons-export-card','cons-clear-row']
+      .forEach(id=>document.getElementById(id).style.display='none');
+    document.getElementById('cons-file-input').value='';
+  };
+
+  /* Remover recalcula tudo — a referência de colunas pode mudar. */
+  window.cons_removerArquivo = function(i){
+    parsed.splice(i,1);
+    if(parsed.length) render();
+    else window.cons_limparTudo();
+  };
+
+  /* Concatena as matrizes de todos os arquivos com nº de colunas = referência. */
+  function consolidar(){
+    const valid=parsed.filter(p=>!p.error);
+    if(!valid.length) return [];
+    const refCols=valid[0].ncols;
+    let all=[];
+    valid.filter(p=>p.ncols===refCols).forEach(p=>{ all=all.concat(p.rows); });
+    return all;
+  }
+
+  window.cons_exportar = function(){
+    const data=consolidar();
+    if(!data.length){ alert('Nada para exportar.'); return; }
+    const fmt=document.getElementById('cons-fmt').value;
+    const stamp=new Date().toISOString().slice(0,10);
+    const custom=document.getElementById('cons-fname').value.trim().replace(/[\\/:*?"<>|]/g,'');
+    const fname = custom || `consolidado_${stamp}`;
+
+    if(fmt==='xlsx'){
+      const ws=XLSX.utils.aoa_to_sheet(data);
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,'Consolidado');
+      XLSX.writeFile(wb,fname+'.xlsx');
+    }else{
+      const sep = fmt==='txt' ? '\t' : ',';
+      // BOM garante acento correto no Excel
+      const body=data.map(r=>r.map(c=>csvCell(c,sep)).join(sep)).join('\r\n');
+      download('\uFEFF'+body, fname+'.'+fmt, fmt==='csv'?'text/csv':'text/plain');
+    }
+  };
+
+  function csvCell(v,sep){
+    v=(v==null)?'':String(v);
+    return (v.includes(sep)||v.includes('"')||v.includes('\n'))
+      ? '"'+v.replace(/"/g,'""')+'"' : v;
+  }
+  function download(content,filename,mime){
+    const blob=new Blob([content],{type:mime+';charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=filename; a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 })();
 </script>
 </body>
