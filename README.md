@@ -101,7 +101,7 @@ Versão dedicada do Conversor SQL IN para listas de **AITs**: cole uma AIT por l
 
 ---
 
-### 🚛 Unificador de Frota
+### 🚛 Unificar Arquivo
 
 Une até **3 planilhas Excel** de restrição/localização de frota em um único CSV padronizado.
 

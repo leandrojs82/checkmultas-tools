@@ -639,7 +639,7 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
           <svg><use href="#ic-sqlait"/></svg> SQL IN AIT
         </button>
         <button class="nav-item" data-id="frota" onclick="showPage('frota',this)">
-          <svg><use href="#ic-frota"/></svg> Unificador de Frota
+          <svg><use href="#ic-frota"/></svg> Unificar Arquivo
         </button>
         <button class="nav-item" data-id="consolidador" onclick="showPage('consolidador',this)">
           <svg><use href="#ic-consolidador"/></svg> Verificador de Colunas
@@ -724,9 +724,9 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
             <p>Converte uma lista de AITs em cláusula <code>IN ('...')</code> com aspas simples, pronta para a query.</p>
           </div>
           <div class="home-card" role="button" tabindex="0" data-id="frota" data-group="dados" onclick="showPageByName('frota')">
-            <button class="fav-btn" data-id="frota" aria-pressed="false" aria-label="Favoritar Unificador de Frota" onclick="toggleFav(event,'frota')"><svg><use href="#ic-heart"/></svg></button>
+            <button class="fav-btn" data-id="frota" aria-pressed="false" aria-label="Favoritar Unificar Arquivo" onclick="toggleFav(event,'frota')"><svg><use href="#ic-heart"/></svg></button>
             <div class="card-icon-box"><svg><use href="#ic-frota"/></svg></div>
-            <h3>Unificador de Frota</h3>
+            <h3>Unificar Arquivo</h3>
             <p>Une até 3 planilhas Excel de restrição/localização em um único CSV padronizado com colunas validadas.</p>
           </div>
           <div class="home-card" role="button" tabindex="0" data-id="consolidador" data-group="dados" onclick="showPageByName('consolidador')">
@@ -1140,7 +1140,7 @@ function showPage(id, navBtn) {
     jsoncsv:   ['JSON → CSV','Converter e exportar'],
     sqlin:     ['Conversor SQL IN','Lista → cláusula IN'],
     sqlait:    ['SQL IN AIT','Lista de AITs → cláusula IN'],
-    frota:     ['Unificador de Frota','3 planilhas → 1 CSV'],
+    frota:     ['Unificar Arquivo','3 planilhas → 1 CSV'],
     consolidador: ['Verificador de Colunas','txt · csv · xlsx → 1 arquivo']
   };
   const [t, s] = titles[id] || ['',''];
