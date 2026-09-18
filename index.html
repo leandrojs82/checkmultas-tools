@@ -115,115 +115,157 @@ textarea,input{font-family:inherit;}
   position:fixed;top:0;left:0;height:100vh;z-index:50;
   transition:transform 200ms ease-out;
 }
-.sidebar-logo{
-  padding:var(--sp-5) var(--sp-4) var(--sp-4);
-  border-bottom:1px solid var(--border-s);
-  display:flex;align-items:center;gap:var(--sp-3);
-}
-.logo-badge{
-  width:32px;height:32px;border-radius:var(--r-md);
-  background:var(--accent);color:#fff;
-  display:grid;place-items:center;flex-shrink:0;
-}
-.logo-badge svg{width:17px;height:17px;}
-.logo-text{font-size:var(--fs-13);font-weight:600;line-height:1.2;letter-spacing:-.01em;}
-.logo-sub{font-size:var(--fs-11);color:var(--text-3);}
+.shell.nav-hidden .sidebar{transform:translateX(-100%);}
+.shell.nav-hidden .main{margin-left:0;}
 
-.sidebar-nav{flex:1;padding:var(--sp-3) var(--sp-2);overflow-y:auto;}
-.nav-label{
-  font-size:var(--fs-11);font-weight:600;text-transform:uppercase;
-  letter-spacing:.09em;color:var(--text-3);
-  padding:var(--sp-4) var(--sp-2) var(--sp-1);
+/* Banner do logo — degradê da marca com corte curvo */
+.sidebar-logo{
+  position:relative;overflow:hidden;
+  padding:26px 16px 44px;text-align:center;color:#fff;
+  background:linear-gradient(160deg,var(--accent) 0%,var(--accent-h) 55%,#ffb38a 135%);
 }
+.sidebar-logo::after{
+  content:"";position:absolute;left:-25%;right:-25%;bottom:-46px;height:70px;
+  background:var(--bg-surface);border-radius:50%;transform:rotate(-6deg);
+}
+.logo-text{
+  font-size:20px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  line-height:1.15;
+}
+.logo-sub{font-size:var(--fs-12);opacity:.92;margin-top:6px;line-height:1.4;}
+
+.sidebar-nav{flex:1;padding:var(--sp-2) var(--sp-2) var(--sp-5);overflow-y:auto;}
 .nav-item{
-  position:relative;display:flex;align-items:center;gap:var(--sp-3);
-  padding:8px var(--sp-3);border-radius:var(--r-md);
-  font-family:inherit;font-size:var(--fs-13);color:var(--text-2);
+  position:relative;display:flex;align-items:center;gap:10px;
+  padding:7px 10px;border-radius:var(--r-sm);
+  font-family:inherit;font-size:var(--fs-12);color:var(--text-2);
+  text-transform:uppercase;letter-spacing:.02em;
   cursor:pointer;border:none;background:none;width:100%;text-align:left;
   transition:background 120ms ease-out,color 120ms ease-out;
 }
-.nav-item::before{
-  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
-  width:2px;height:0;border-radius:1px;background:var(--accent);
-  transition:height 150ms ease-out;
-}
 .nav-item:hover{background:var(--bg-elevated);color:var(--text-1);}
-.nav-item.active{background:var(--bg-elevated);color:var(--text-1);font-weight:600;}
-.nav-item.active::before{height:16px;}
-.nav-item svg{width:17px;height:17px;flex-shrink:0;}
+.nav-item.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;}
+.nav-item.nav-home{margin:var(--sp-2) 0;}
 
-.sidebar-footer{
-  padding:14px 10px;border-top:1px solid var(--border-s);
+/* Grupos recolhíveis */
+.nav-group{margin-top:var(--sp-2);}
+.nav-group-hd{
+  display:flex;align-items:center;gap:6px;width:100%;
+  padding:6px 4px;border:none;background:none;text-align:left;
+  font-family:inherit;font-size:var(--fs-12);font-weight:500;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.04em;
+  border-radius:var(--r-sm);
 }
-.theme-switcher{
-  display:flex;gap:6px;
+.nav-group-hd:hover{color:var(--text-1);}
+.nav-group-hd svg{width:12px;height:12px;transition:transform 150ms ease-out;}
+.nav-group.open .nav-group-hd svg{transform:rotate(90deg);}
+.nav-group-items{
+  display:none;margin-left:10px;padding-left:6px;
+  border-left:1px solid var(--border-s);
 }
-.btn-theme{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  flex:1;padding:8px 6px;border-radius:var(--r-md);
-  border:1px solid var(--border-m);background:var(--bg-elevated);
-  color:var(--text-2);font-size:12px;font-weight:500;
-  transition:background 150ms,color 150ms,border-color 150ms;
-}
-.btn-theme:hover{background:var(--bg-hover);color:var(--text-1);}
-.btn-theme svg{width:13px;height:13px;flex-shrink:0;}
-.btn-theme.active{
-  background:var(--accent);border-color:var(--accent);
-  color:#fff;
-}
+.nav-group.open .nav-group-items{display:block;}
+.nav-group[hidden]{display:none;}
 
 /* --- CONTEÚDO PRINCIPAL --- */
 .main{
   margin-left:var(--sidebar-w);
   flex:1;min-width:0;
   display:flex;flex-direction:column;
+  transition:margin-left 200ms ease-out;
 }
 
-/* Topbar dentro do main */
+/* Topbar: menu · home · título · busca · tema */
 .topbar{
   height:56px;background:color-mix(in srgb,var(--bg-surface) 88%,transparent);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border-bottom:1px solid var(--border-s);
-  display:flex;align-items:center;padding:0 var(--sp-6);
-  position:sticky;top:0;z-index:40;gap:var(--sp-3);
+  display:flex;align-items:center;padding:0 var(--sp-5);
+  position:sticky;top:0;z-index:40;gap:var(--sp-2);
 }
-.topbar-title{font-size:var(--fs-13);font-weight:600;}
+.tb-icon{
+  display:grid;place-items:center;width:34px;height:34px;flex-shrink:0;
+  background:none;border:none;color:var(--text-2);border-radius:var(--r-md);
+  transition:background 120ms,color 120ms;
+}
+.tb-icon:hover{background:var(--bg-elevated);color:var(--text-1);}
+.tb-icon svg{width:18px;height:18px;}
+.topbar-title{font-size:var(--fs-13);font-weight:600;white-space:nowrap;margin-left:var(--sp-2);}
+.topbar-title:empty{display:none;}
 .topbar-sub{
-  font-size:var(--fs-12);color:var(--text-3);
+  font-size:var(--fs-12);color:var(--text-3);white-space:nowrap;
   padding-left:var(--sp-3);border-left:1px solid var(--border-s);
 }
 .topbar-sub:empty{display:none;}
-.menu-toggle{
-  display:none;background:none;border:none;color:var(--text-2);
-  padding:6px;border-radius:var(--r-md);
+.search{
+  flex:1;display:flex;align-items:center;gap:var(--sp-2);
+  height:36px;padding:0 10px;margin:0 var(--sp-2) 0 var(--sp-3);
+  background:var(--bg-elevated);border:1px solid var(--border-s);border-radius:var(--r-md);
+  color:var(--text-3);transition:border-color 120ms,box-shadow 120ms;min-width:0;
 }
-.menu-toggle svg{width:18px;height:18px;}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.search svg{width:15px;height:15px;flex-shrink:0;}
+.search input{
+  flex:1;min-width:0;background:none;border:none;outline:none;
+  color:var(--text-1);font-size:var(--fs-13);
+}
+.search input::placeholder{color:var(--text-3);}
+.search input::-webkit-search-cancel-button{display:none;}
+.search kbd{
+  font-size:var(--fs-11);color:var(--text-3);
+  border:1px solid var(--border-m);border-radius:4px;padding:1px 6px;
+  white-space:nowrap;
+}
+.theme-ic[hidden]{display:none;}
 
-/* TELA DE BOAS-VINDAS */
-.home-screen{max-width:840px;margin:0 auto;padding:var(--sp-8) var(--sp-6);}
-.home-hero{text-align:center;margin-bottom:var(--sp-7);}
-.home-hero h1{font-size:var(--fs-30);font-weight:700;margin-bottom:var(--sp-2);letter-spacing:-.02em;}
-.home-hero h1 span{color:var(--accent);}
-.home-hero p{color:var(--text-2);font-size:var(--fs-15);}
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--sp-4);}
+/* TELA INICIAL */
+.home-screen{padding:var(--sp-6) var(--sp-6) var(--sp-8);}
+.home-banner{
+  max-width:480px;border-radius:var(--r-md);padding:var(--sp-5);
+  color:#fff;margin-bottom:var(--sp-7);
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-h) 60%,#ffb38a 150%);
+}
+.home-banner>svg{width:34px;height:34px;margin-bottom:var(--sp-4);opacity:.95;}
+.home-banner h1{font-size:var(--fs-18);font-weight:700;margin-bottom:var(--sp-1);letter-spacing:-.01em;}
+.home-banner p{font-size:var(--fs-13);line-height:1.55;opacity:.95;}
+.home-banner p svg{width:12px;height:12px;vertical-align:-2px;}
+.section-title{
+  font-size:var(--fs-13);font-weight:600;color:var(--text-2);
+  margin:0 0 var(--sp-3);
+}
+.cards-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:var(--sp-3);margin-bottom:var(--sp-7);
+}
 .home-card{
-  background:var(--bg-surface);border:1px solid var(--border-s);
-  border-radius:var(--r-lg);padding:var(--sp-5);cursor:pointer;
-  display:flex;flex-direction:column;gap:var(--sp-3);
-  transition:border-color 180ms ease-out,background 180ms ease-out;
+  position:relative;background:var(--bg-surface);border:1px solid var(--border-s);
+  border-radius:var(--r-md);padding:var(--sp-5);cursor:pointer;
+  display:flex;flex-direction:column;gap:var(--sp-2);min-height:150px;
+  transition:border-color 160ms ease-out,background 160ms ease-out;
 }
-.home-card:hover{border-color:var(--accent);background:var(--bg-elevated);}
+.home-card:hover,.home-card:focus-visible{border-color:var(--accent);background:var(--bg-elevated);outline:none;}
+.home-card[hidden]{display:none;}
 .card-icon-box{
-  width:38px;height:38px;border-radius:var(--r-md);
-  background:var(--bg-elevated);border:1px solid var(--border-s);
-  color:var(--text-2);display:grid;place-items:center;
-  transition:color 180ms ease-out,border-color 180ms ease-out;
+  width:40px;height:40px;color:var(--text-2);margin-bottom:var(--sp-1);
+  display:grid;place-items:center;transition:color 160ms ease-out;
 }
-.card-icon-box svg{width:19px;height:19px;}
-.home-card:hover .card-icon-box{color:var(--accent);border-color:var(--accent);}
+.card-icon-box svg{width:36px;height:36px;}
+.home-card:hover .card-icon-box{color:var(--accent);}
 .home-card h3{font-size:var(--fs-15);font-weight:600;}
-.home-card p{font-size:var(--fs-13);color:var(--text-2);line-height:1.55;flex:1;}
-.card-cta{font-size:var(--fs-12);color:var(--accent);font-weight:600;}
+.home-card p{font-size:var(--fs-12);color:var(--text-2);line-height:1.55;flex:1;}
+.fav-btn{
+  position:absolute;top:14px;right:14px;
+  width:28px;height:28px;border-radius:50%;border:none;background:none;
+  color:var(--text-3);display:grid;place-items:center;opacity:.55;
+  transition:opacity 120ms,color 120ms,background 120ms;
+}
+.fav-btn svg{width:15px;height:15px;}
+.home-card:hover .fav-btn,.fav-btn:focus-visible{opacity:1;}
+.fav-btn:hover{background:var(--bg-hover);color:var(--text-1);}
+.fav-btn[aria-pressed="true"]{opacity:1;color:var(--accent);}
+.fav-btn[aria-pressed="true"] svg{fill:currentColor;}
+.search-empty{color:var(--text-3);font-size:var(--fs-13);padding:var(--sp-4) 0;}
+.search-empty[hidden]{display:none;}
 
 /* PÁGINAS DE APP — container padrão */
 .app-page{display:none;}
@@ -472,10 +514,6 @@ details.preview-block summary::after{content:'+';color:var(--text-2);font-size:1
 details.preview-block[open] summary::after{transform:rotate(45deg);}
 .preview-pre{padding:16px 22px 22px;border-top:1px solid var(--border-s);max-height:320px;overflow:auto;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:12px;line-height:1.65;white-space:pre;color:var(--text-1);margin:0;background:var(--bg-elevated);}
 
-/* --- PROCESSADOR EXCEL --- */
-.exc-transforms li{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-1);font-size:var(--fs-12);color:var(--text-2);}
-.exc-transforms li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ok);flex-shrink:0;}
-
 /* --- FROTA — pipeline e progresso --- */
 .pipeline{
   display:flex;align-items:center;gap:var(--sp-2);
@@ -503,14 +541,17 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
 #page-consolidador input[type=file]{display:none;}
 .hint{color:var(--text-3);font-size:var(--fs-12);margin-top:var(--sp-2);}
 
+
 /* === RESPONSIVO === */
 /* ============================================================ */
 @media(max-width:640px){
-  .sidebar{transform:translateX(-100%);}
+  .sidebar,.shell.nav-hidden .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
-  .main{margin-left:0;}
-  .menu-toggle{display:flex;}
-  .topbar{padding:0 var(--sp-4);}
+  .main,.shell.nav-hidden .main{margin-left:0;}
+  .topbar{padding:0 var(--sp-3);}
+  .topbar-title,.topbar-sub{display:none;}
+  .search kbd{display:none;}
+  .home-screen{padding:var(--sp-4);}
   .app-wrap{padding:var(--sp-5) var(--sp-4) var(--sp-8);}
   .pair{flex-direction:column;align-items:stretch;}
   .arrow{transform:rotate(90deg);padding:0;}
@@ -527,7 +568,7 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
   <symbol id="ic-conversor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/></symbol>
   <symbol id="ic-validador" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></symbol>
   <symbol id="ic-jsoncsv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 12h8M8 16h5"/></symbol>
-  <symbol id="ic-excel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10M3 15h18"/></symbol>
+  <symbol id="ic-sqlait" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h6"/></symbol>
   <symbol id="ic-sqlin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
   <symbol id="ic-frota" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M4 17v-4l2-5h12l2 5v4"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></symbol>
   <symbol id="ic-consolidador" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 12h7M17 8l4 4-4 4"/></symbol>
@@ -539,6 +580,13 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
   <symbol id="ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16h.01"/></symbol>
   <symbol id="ic-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5.5l10 6.5-10 6.5z"/></symbol>
   <symbol id="ic-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a1 1 0 00-1 1v16a1 1 0 001 1h10a1 1 0 001-1V7z"/><path d="M14 3v4h4"/></symbol>
+  <symbol id="ic-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0112 7.7a4.3 4.3 0 017.5 2.8c0 5.4-7.5 10-7.5 10z"/></symbol>
+  <symbol id="ic-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="ic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+  <symbol id="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></symbol>
+  <symbol id="ic-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5H11l-1 8.5L19.5 10H13z"/></symbol>
 </svg>
 <div class="shell">
 
@@ -547,54 +595,56 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
        ==================================================== -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5H11l-1 8.5L19.5 10H13z"/></svg></div>
-      <div>
-        <div class="logo-text">CheckMultas</div>
-        <div class="logo-sub">Ferramentas</div>
-      </div>
+      <div class="logo-text">CheckMultas</div>
+      <div class="logo-sub">Ferramentas para placas<br>e dados veiculares</div>
     </div>
 
     <div class="sidebar-nav">
-      <button class="nav-item active" onclick="showPage('home',this)">
+      <button class="nav-item nav-home active" data-id="home" onclick="showPage('home',this)">
         <svg><use href="#ic-home"/></svg> Início
       </button>
 
-      <div class="nav-label">Placas</div>
-      <button class="nav-item" onclick="showPage('conversor',this)">
-        <svg><use href="#ic-conversor"/></svg> Conversor de Placas
-      </button>
-      <button class="nav-item" onclick="showPage('validador',this)">
-        <svg><use href="#ic-validador"/></svg> Validador de Placas
-      </button>
-
-      <div class="nav-label">Dados</div>
-      <button class="nav-item" onclick="showPage('jsoncsv',this)">
-        <svg><use href="#ic-jsoncsv"/></svg> JSON → CSV
-      </button>
-      <button class="nav-item" onclick="showPage('excel',this)">
-        <svg><use href="#ic-excel"/></svg> Processador Excel
-      </button>
-      <button class="nav-item" onclick="showPage('sqlin',this)">
-        <svg><use href="#ic-sqlin"/></svg> Conversor SQL IN
-      </button>
-      <button class="nav-item" onclick="showPage('frota',this)">
-        <svg><use href="#ic-frota"/></svg> Unificador de Frota
-      </button>
-      <button class="nav-item" onclick="showPage('consolidador',this)">
-        <svg><use href="#ic-consolidador"/></svg> Consolidador de Arquivos
-      </button>
-    </div>
-
-    <div class="sidebar-footer">
-      <div class="theme-switcher">
-        <button class="btn-theme" id="btnDark" onclick="applyTheme('dark')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          Dark
+      <div class="nav-group open" id="navFavGroup" data-group="favoritos" hidden>
+        <button class="nav-group-hd" onclick="toggleGroup(this)" aria-expanded="true">
+          <svg><use href="#ic-chevron"/></svg> Favoritos
         </button>
-        <button class="btn-theme" id="btnLight" onclick="applyTheme('light')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          Claro
+        <div class="nav-group-items" id="navFavItems"></div>
+      </div>
+
+      <div class="nav-group open" data-group="placas">
+        <button class="nav-group-hd" onclick="toggleGroup(this)" aria-expanded="true">
+          <svg><use href="#ic-chevron"/></svg> Placas
         </button>
+        <div class="nav-group-items">
+        <button class="nav-item" data-id="conversor" onclick="showPage('conversor',this)">
+          <svg><use href="#ic-conversor"/></svg> Conversor de Placas
+        </button>
+        <button class="nav-item" data-id="validador" onclick="showPage('validador',this)">
+          <svg><use href="#ic-validador"/></svg> Validador de Placas
+        </button>
+        </div>
+      </div>
+      <div class="nav-group open" data-group="dados">
+        <button class="nav-group-hd" onclick="toggleGroup(this)" aria-expanded="true">
+          <svg><use href="#ic-chevron"/></svg> Dados
+        </button>
+        <div class="nav-group-items">
+        <button class="nav-item" data-id="jsoncsv" onclick="showPage('jsoncsv',this)">
+          <svg><use href="#ic-jsoncsv"/></svg> JSON → CSV
+        </button>
+        <button class="nav-item" data-id="sqlin" onclick="showPage('sqlin',this)">
+          <svg><use href="#ic-sqlin"/></svg> Conversor SQL IN
+        </button>
+        <button class="nav-item" data-id="sqlait" onclick="showPage('sqlait',this)">
+          <svg><use href="#ic-sqlait"/></svg> SQL IN AIT
+        </button>
+        <button class="nav-item" data-id="frota" onclick="showPage('frota',this)">
+          <svg><use href="#ic-frota"/></svg> Unificador de Frota
+        </button>
+        <button class="nav-item" data-id="consolidador" onclick="showPage('consolidador',this)">
+          <svg><use href="#ic-consolidador"/></svg> Verificador de Colunas
+        </button>
+        </div>
       </div>
     </div>
   </nav>
@@ -604,13 +654,25 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
        ==================================================== -->
   <div class="main">
     <div class="topbar">
-      <button class="menu-toggle" aria-label="Abrir menu" onclick="toggleSidebar()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
+      <button class="tb-icon" aria-label="Mostrar ou ocultar menu" onclick="toggleSidebar()">
+        <svg><use href="#ic-menu"/></svg>
       </button>
-      <span class="topbar-title" id="topbarTitle">Início</span>
+      <button class="tb-icon" aria-label="Início" onclick="showPageByName('home')">
+        <svg><use href="#ic-home"/></svg>
+      </button>
+      <span class="topbar-title" id="topbarTitle"></span>
       <span class="topbar-sub" id="topbarSub"></span>
+
+      <label class="search">
+        <svg><use href="#ic-search"/></svg>
+        <input type="search" id="toolSearch" placeholder="Pesquisar ferramenta" autocomplete="off" spellcheck="false">
+        <kbd>Ctrl + K</kbd>
+      </label>
+
+      <button class="tb-icon" id="themeToggle" aria-label="Alternar tema" onclick="toggleTheme()">
+        <svg class="theme-ic" id="themeIcSun"><use href="#ic-sun"/></svg>
+        <svg class="theme-ic" id="themeIcMoon" hidden><use href="#ic-moon"/></svg>
+      </button>
     </div>
 
     <!-- ===================================================
@@ -618,54 +680,63 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
          =================================================== -->
     <div id="page-home" class="app-page active">
       <div class="home-screen">
-        <div class="home-hero">
-          <h1>Ferramentas <span>CheckMultas</span></h1>
-          <p>Utilitários para processamento de placas, infrações e dados veiculares</p>
+        <div class="home-banner">
+          <svg><use href="#ic-bolt"/></svg>
+          <h1>Ferramentas CheckMultas</h1>
+          <p>Utilitários para placas, infrações e dados veiculares. Marque com <svg><use href="#ic-heart"/></svg> as que mais usa para tê-las sempre à mão.</p>
         </div>
-        <div class="cards-grid">
-          <div class="home-card" role="button" tabindex="0" onclick="showPageByName('conversor')">
+
+        <div id="favSection" hidden>
+          <div class="section-title">Favoritos</div>
+          <div class="cards-grid" id="favGrid"></div>
+        </div>
+
+        <div class="section-title" id="allTitle">Todas as ferramentas</div>
+        <div class="cards-grid" id="allGrid">
+          <div class="home-card" role="button" tabindex="0" data-id="conversor" data-group="placas" onclick="showPageByName('conversor')">
+            <button class="fav-btn" data-id="conversor" aria-pressed="false" aria-label="Favoritar Conversor de Placas" onclick="toggleFav(event,'conversor')"><svg><use href="#ic-heart"/></svg></button>
             <div class="card-icon-box"><svg><use href="#ic-conversor"/></svg></div>
             <h3>Conversor de Placas</h3>
             <p>Converte entre Tradicional (ABC-1234) e Mercosul (ABC1D23) em lote, com exportação SQL IN.</p>
-            <div class="card-cta">Abrir →</div>
           </div>
-          <div class="home-card" role="button" tabindex="0" onclick="showPageByName('validador')">
+          <div class="home-card" role="button" tabindex="0" data-id="validador" data-group="placas" onclick="showPageByName('validador')">
+            <button class="fav-btn" data-id="validador" aria-pressed="false" aria-label="Favoritar Validador de Placas" onclick="toggleFav(event,'validador')"><svg><use href="#ic-heart"/></svg></button>
             <div class="card-icon-box"><svg><use href="#ic-validador"/></svg></div>
             <h3>Validador de Placas</h3>
             <p>Valida lotes nos dois formatos com diagnóstico por posição e exportação XLSX separada.</p>
-            <div class="card-cta">Abrir →</div>
           </div>
-          <div class="home-card" role="button" tabindex="0" onclick="showPageByName('jsoncsv')">
+          <div class="home-card" role="button" tabindex="0" data-id="jsoncsv" data-group="dados" onclick="showPageByName('jsoncsv')">
+            <button class="fav-btn" data-id="jsoncsv" aria-pressed="false" aria-label="Favoritar JSON → CSV" onclick="toggleFav(event,'jsoncsv')"><svg><use href="#ic-heart"/></svg></button>
             <div class="card-icon-box"><svg><use href="#ic-jsoncsv"/></svg></div>
             <h3>JSON → CSV</h3>
             <p>Converte JSON em CSV compatível com Excel e extrai placas em formato SQL IN.</p>
-            <div class="card-cta">Abrir →</div>
           </div>
-          <div class="home-card" role="button" tabindex="0" onclick="showPageByName('excel')">
-            <div class="card-icon-box"><svg><use href="#ic-excel"/></svg></div>
-            <h3>Processador Excel</h3>
-            <p>Reorganiza colunas de planilhas XLSX para o formato padrão e exporta CSV.</p>
-            <div class="card-cta">Abrir →</div>
-          </div>
-          <div class="home-card" role="button" tabindex="0" onclick="showPageByName('sqlin')">
+          <div class="home-card" role="button" tabindex="0" data-id="sqlin" data-group="dados" onclick="showPageByName('sqlin')">
+            <button class="fav-btn" data-id="sqlin" aria-pressed="false" aria-label="Favoritar Conversor SQL IN" onclick="toggleFav(event,'sqlin')"><svg><use href="#ic-heart"/></svg></button>
             <div class="card-icon-box"><svg><use href="#ic-sqlin"/></svg></div>
             <h3>Conversor SQL IN</h3>
             <p>Converte uma lista de valores em cláusula <code>IN (...)</code> pronta para uso em queries SQL.</p>
-            <div class="card-cta">Abrir →</div>
           </div>
-          <div class="home-card" role="button" tabindex="0" onclick="showPageByName('frota')">
+          <div class="home-card" role="button" tabindex="0" data-id="sqlait" data-group="dados" onclick="showPageByName('sqlait')">
+            <button class="fav-btn" data-id="sqlait" aria-pressed="false" aria-label="Favoritar SQL IN AIT" onclick="toggleFav(event,'sqlait')"><svg><use href="#ic-heart"/></svg></button>
+            <div class="card-icon-box"><svg><use href="#ic-sqlait"/></svg></div>
+            <h3>SQL IN AIT</h3>
+            <p>Converte uma lista de AITs em cláusula <code>IN ('...')</code> com aspas simples, pronta para a query.</p>
+          </div>
+          <div class="home-card" role="button" tabindex="0" data-id="frota" data-group="dados" onclick="showPageByName('frota')">
+            <button class="fav-btn" data-id="frota" aria-pressed="false" aria-label="Favoritar Unificador de Frota" onclick="toggleFav(event,'frota')"><svg><use href="#ic-heart"/></svg></button>
             <div class="card-icon-box"><svg><use href="#ic-frota"/></svg></div>
             <h3>Unificador de Frota</h3>
             <p>Une até 3 planilhas Excel de restrição/localização em um único CSV padronizado com colunas validadas.</p>
-            <div class="card-cta">Abrir →</div>
           </div>
-          <div class="home-card" role="button" tabindex="0" onclick="showPageByName('consolidador')">
+          <div class="home-card" role="button" tabindex="0" data-id="consolidador" data-group="dados" onclick="showPageByName('consolidador')">
+            <button class="fav-btn" data-id="consolidador" aria-pressed="false" aria-label="Favoritar Verificador de Colunas" onclick="toggleFav(event,'consolidador')"><svg><use href="#ic-heart"/></svg></button>
             <div class="card-icon-box"><svg><use href="#ic-consolidador"/></svg></div>
-            <h3>Consolidador de Arquivos</h3>
+            <h3>Verificador de Colunas</h3>
             <p>Une múltiplos .txt, .csv e .xlsx em um único conjunto, com validação de estrutura e sugestão de VARCHAR.</p>
-            <div class="card-cta">Abrir →</div>
           </div>
         </div>
+        <p class="search-empty" id="searchEmpty" hidden></p>
       </div>
     </div>
 
@@ -792,56 +863,6 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
       </div>
     </div>
 
-    <!-- ===================================================
-         APP 4 — PROCESSADOR EXCEL
-         =================================================== -->
-    <div id="page-excel" class="app-page">
-      <div class="app-wrap">
-        <div class="drop" id="exc-upload-zone" role="button" tabindex="0" aria-label="Selecionar arquivo Excel">
-          <input type="file" id="exc-file-input" accept=".xls,.xlsx">
-          <svg><use href="#ic-upload"/></svg>
-          <span class="drop__main">Arraste um arquivo Excel aqui</span>
-          <span class="drop__hint">ou clique para selecionar (.xls ou .xlsx)</span>
-        </div>
-
-        <div id="exc-status-wrap"></div>
-
-        <div class="exc-transforms panel" id="exc-transforms" style="display:none;">
-          <div class="panel__label">Transformações Aplicadas</div>
-          <ul>
-            <li><strong>Coluna A</strong>: placa_Veiculo (preservada)</li>
-            <li><strong>Coluna B</strong>: numero_chassis_veiculo (preservada)</li>
-            <li><strong>Coluna C</strong>: numero_renavam (preservada)</li>
-            <li><strong>Coluna D</strong>: codigo_empresa (preservada)</li>
-            <li><strong>Coluna E</strong>: silga_UF (preservada)</li>
-            <li><strong>Coluna F</strong>: Situação (de G)</li>
-            <li><strong>Coluna G</strong>: Tipo consulta (reorganizada)</li>
-            <li><strong>Coluna H</strong>: Tipo Movimentacao (novo → "Inclusao")</li>
-            <li><strong>Coluna I</strong>: dt_situacao (datas preservadas)</li>
-            <li><strong>Coluna J</strong>: cnpj (vazio)</li>
-            <li><strong>Coluna K</strong>: UF_venda (de F)</li>
-          </ul>
-        </div>
-
-        <div class="stat-grid" id="exc-details" style="display:none;">
-          <div class="stat"><div class="stat__label">Arquivo</div><div class="stat__value" id="exc-d-name">—</div></div>
-          <div class="stat"><div class="stat__label">Abas</div><div class="stat__value" id="exc-d-sheets">—</div></div>
-          <div class="stat"><div class="stat__label">Linhas processadas</div><div class="stat__value" id="exc-d-rows">—</div></div>
-          <div class="stat"><div class="stat__label">Tamanho</div><div class="stat__value" id="exc-d-size">—</div></div>
-        </div>
-
-        <div id="exc-preview-section" style="display:none;">
-          <div class="panel__label" style="margin-bottom:8px;">Pré-visualização (primeiras 10 linhas)</div>
-          <div class="table-wrap" id="exc-preview-wrap"></div>
-        </div>
-
-        <div class="btn-row" id="exc-action-row" style="display:none;">
-          <button class="btn btn--primary" onclick="exc_download()"><svg><use href="#ic-download"/></svg> Baixar CSV</button>
-          <button class="btn" onclick="exc_reset()"><svg><use href="#ic-conversor"/></svg> Processar outro arquivo</button>
-        </div>
-      </div>
-    </div>
-
   <!-- ===================================================
          APP 5 — CONVERSOR SQL IN
          =================================================== -->
@@ -884,6 +905,49 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
 
       </div><!-- /app-wrap -->
     </div><!-- /page-sqlin -->
+
+    <!-- ===================================================
+         APP 5b — SQL IN AIT
+         =================================================== -->
+    <div id="page-sqlait" class="app-page">
+      <div class="app-wrap" style="max-width:620px;">
+        <div class="panel">
+          <label class="panel__label" for="sqlait-ta">Cole as AITs aqui</label>
+          <textarea class="field field--area field--mono" id="sqlait-ta" rows="6"
+            placeholder="AB12345678&#10;AB12345679&#10;AB12345680"
+            spellcheck="false" autocomplete="off"></textarea>
+          <div class="input-hint">
+            Aceita valores separados por quebra de linha &middot;
+            <kbd>Ctrl</kbd>+<kbd>Enter</kbd> para converter
+          </div>
+          <div class="btn-row">
+            <button class="btn btn--primary" onclick="sqlait_convert()">Converter</button>
+            <button class="btn" onclick="sqlait_clear()">Limpar</button>
+          </div>
+        </div>
+
+        <!-- estado vazio -->
+        <div class="empty" id="sqlait-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
+          <p>Cole as AITs e clique em Converter</p>
+        </div>
+
+        <!-- resultado -->
+        <div id="sqlait-output" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="panel__label" style="margin:0;">Resultado SQL</span>
+            <span id="sqlait-badge" class="tag"></span>
+          </div>
+          <div id="sqlait-box" class="sqlin-box"></div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn" id="sqlait-copy-btn" onclick="sqlait_copy()"><svg><use href="#ic-copy"/></svg> Copiar</button>
+          </div>
+        </div>
+
+      </div><!-- /app-wrap -->
+    </div><!-- /page-sqlait -->
 
     <!-- ===================================================
          APP 6 — UNIFICADOR DE FROTA IMPEDIMENTO
@@ -1068,30 +1132,33 @@ details.preview-block[open] summary::after{transform:rotate(45deg);}
 function showPage(id, navBtn) {
   document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (navBtn) navBtn.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.id === id));
   const titles = {
-    home: ['Início',''],
+    home: ['',''],
     conversor: ['Conversor de Placas','Tradicional ↔ Mercosul'],
     validador: ['Validador de Placas','em lote'],
     jsoncsv:   ['JSON → CSV','Converter e exportar'],
-    excel:     ['Processador Excel','Reorganizar e exportar CSV'],
     sqlin:     ['Conversor SQL IN','Lista → cláusula IN'],
+    sqlait:    ['SQL IN AIT','Lista de AITs → cláusula IN'],
     frota:     ['Unificador de Frota','3 planilhas → 1 CSV'],
-    consolidador: ['Consolidador de Arquivos','txt · csv · xlsx → 1 arquivo']
+    consolidador: ['Verificador de Colunas','txt · csv · xlsx → 1 arquivo']
   };
   const [t, s] = titles[id] || ['',''];
   document.getElementById('topbarTitle').textContent = t;
   document.getElementById('topbarSub').textContent = s;
   if (window.innerWidth <= 640) document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0, 0);
 }
 function showPageByName(id) {
-  const btn = [...document.querySelectorAll('.nav-item')]
-    .find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+id+"'"));
-  showPage(id, btn);
+  showPage(id, null);
 }
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
+  if (window.innerWidth <= 640) document.getElementById('sidebar').classList.toggle('open');
+  else document.querySelector('.shell').classList.toggle('nav-hidden');
+}
+function toggleGroup(btn) {
+  const open = btn.parentElement.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open);
 }
 
 /* Enter/Espaço ativam os controles não-nativos (cards da home e
@@ -1108,19 +1175,95 @@ document.addEventListener('keydown', e => {
   card.click();
 });
 
+/* Busca de ferramentas (topbar) — filtra os cards da home */
+const toolSearch = document.getElementById('toolSearch');
+const normalize = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+function filterTools(q) {
+  const term = normalize(q.trim());
+  let shown = 0;
+  document.querySelectorAll('#allGrid .home-card').forEach(c => {
+    const hit = !term || normalize(c.textContent).includes(term);
+    c.hidden = !hit;
+    if (hit) shown++;
+  });
+  document.getElementById('favSection').hidden = !!term || !getFavs().length;
+  document.getElementById('allTitle').textContent = term ? `Resultados para "${q.trim()}"` : 'Todas as ferramentas';
+  const empty = document.getElementById('searchEmpty');
+  empty.hidden = shown > 0;
+  empty.textContent = `Nenhuma ferramenta corresponde a "${q.trim()}". Tente outro termo.`;
+}
+toolSearch.addEventListener('input', () => {
+  if (!document.getElementById('page-home').classList.contains('active')) showPageByName('home');
+  filterTools(toolSearch.value);
+});
+toolSearch.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const first = document.querySelector('#allGrid .home-card:not([hidden])');
+    if (first) { toolSearch.value = ''; filterTools(''); first.click(); }
+  }
+  if (e.key === 'Escape') { toolSearch.value = ''; filterTools(''); toolSearch.blur(); }
+});
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault(); toolSearch.focus(); toolSearch.select();
+  }
+});
+
+/* Favoritos — persistidos em localStorage, exibidos na home e no menu */
+const FAV_KEY = 'cm-favs';
+let memFavs = null; /* fallback quando o storage está indisponível */
+function getFavs() {
+  if (memFavs) return memFavs;
+  try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch { return []; }
+}
+function toggleFav(e, id) {
+  e.stopPropagation();
+  let favs = getFavs();
+  favs = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id];
+  memFavs = favs;
+  try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch {}
+  renderFavs();
+}
+function renderFavs() {
+  const favs = getFavs();
+  document.querySelectorAll('#allGrid .fav-btn').forEach(b => {
+    const on = favs.includes(b.dataset.id);
+    b.setAttribute('aria-pressed', on);
+    b.setAttribute('aria-label', (on ? 'Remover dos favoritos: ' : 'Favoritar ') + b.closest('.home-card').querySelector('h3').textContent);
+  });
+  const favGrid = document.getElementById('favGrid');
+  favGrid.innerHTML = '';
+  favs.forEach(id => {
+    const src = document.querySelector(`#allGrid .home-card[data-id="${id}"]`);
+    if (src) favGrid.appendChild(src.cloneNode(true));
+  });
+  document.getElementById('favSection').hidden = !favs.length || !!toolSearch.value.trim();
+  const navFav = document.getElementById('navFavItems');
+  navFav.innerHTML = '';
+  favs.forEach(id => {
+    const src = document.querySelector(`.nav-group:not(#navFavGroup) .nav-item[data-id="${id}"]`);
+    if (src) navFav.appendChild(src.cloneNode(true));
+  });
+  document.getElementById('navFavGroup').hidden = !favs.length;
+}
+renderFavs();
+
 /* Tema */
 (function initTheme(){
-  const saved = localStorage.getItem('cm-theme') ||
-    (matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
+  let saved = null;
+  try { saved = localStorage.getItem('cm-theme'); } catch {}
+  saved = saved || (matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
   applyTheme(saved);
 })();
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('cm-theme', t);
-  const btnDark  = document.getElementById('btnDark');
-  const btnLight = document.getElementById('btnLight');
-  if (btnDark)  btnDark.classList.toggle('active',  t === 'dark');
-  if (btnLight) btnLight.classList.toggle('active', t === 'light');
+  try { localStorage.setItem('cm-theme', t); } catch {}
+  const sun = document.getElementById('themeIcSun'), moon = document.getElementById('themeIcMoon');
+  if (sun)  sun.hidden  = t !== 'dark';
+  if (moon) moon.hidden = t !== 'light';
+}
+function toggleTheme(){
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 }
 
 /* ============================================================
@@ -1485,178 +1628,6 @@ function val_baixar(tipo){
 })();
 
 /* ============================================================
-   APP 4 — PROCESSADOR EXCEL
-   Lógica idêntica ao Reorganização_de_colunas_arquivo_movimentacao.html
-   ============================================================ */
-(function(){
-  const state={ficheiro:null,nomeOriginal:'',dadosProcessados:[],colunasOriginais:[],colunasProcessadas:[]};
-
-  const uploadZone  = document.getElementById('exc-upload-zone');
-  const fileInput   = document.getElementById('exc-file-input');
-  const statusWrap  = document.getElementById('exc-status-wrap');
-  const transforms  = document.getElementById('exc-transforms');
-  const detailsEl   = document.getElementById('exc-details');
-  const previewSec  = document.getElementById('exc-preview-section');
-  const actionRow   = document.getElementById('exc-action-row');
-
-  uploadZone.addEventListener('click',()=>fileInput.click());
-  uploadZone.addEventListener('dragover',(e)=>{e.preventDefault();e.stopPropagation();uploadZone.classList.add('is-over');});
-  uploadZone.addEventListener('dragenter',(e)=>{e.preventDefault();e.stopPropagation();uploadZone.classList.add('is-over');});
-  uploadZone.addEventListener('dragleave',(e)=>{e.preventDefault();e.stopPropagation();uploadZone.classList.remove('is-over');});
-  uploadZone.addEventListener('drop',(e)=>{
-    e.preventDefault();e.stopPropagation();uploadZone.classList.remove('is-over');
-    const files=e.dataTransfer.files;if(files.length>0) processarFicheiro(files[0]);
-  });
-  document.addEventListener('dragover',(e)=>{e.preventDefault();e.stopPropagation();});
-  document.addEventListener('drop',(e)=>{
-    e.preventDefault();e.stopPropagation();
-    const files=e.dataTransfer.files;
-    if(files.length>0&&(files[0].name.endsWith('.xls')||files[0].name.endsWith('.xlsx'))) processarFicheiro(files[0]);
-  });
-  fileInput.addEventListener('change',(e)=>{if(e.target.files.length>0) processarFicheiro(e.target.files[0]);});
-
-  function mostrarStatus(tipo,mensagem){
-    const map={info:'info',processando:'warn',sucesso:'ok',erro:'err'};
-    const icons={info:'#ic-alert',sucesso:'#ic-check',erro:'#ic-alert'};
-    const cls=map[tipo]||'info';
-    const icon = tipo==='processando'
-      ? '<div class="spinner"></div>'
-      : `<svg class="status__icon"><use href="${icons[tipo]||'#ic-alert'}"/></svg>`;
-    statusWrap.innerHTML=`<div class="status ${cls}">${icon}<div>${mensagem}</div></div>`;
-  }
-
-  function converterDataExcel(valor){
-    if(!valor) return'';
-    if(!isNaN(valor)&&typeof valor==='number'){
-      const dataBase=new Date(1899,11,30);
-      const data=new Date(dataBase.getTime()+parseInt(valor)*86400000);
-      return String(data.getDate()).padStart(2,'0')+'/'+String(data.getMonth()+1).padStart(2,'0')+'/'+data.getFullYear();
-    }
-    if(typeof valor==='string'){
-      const m1=valor.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m1) return`${m1[3]}/${m1[2]}/${m1[1]}`;
-      const m2=valor.match(/^(\d{2})[-\/](\d{2})[-\/](\d{4})/);if(m2) return`${m2[1]}/${m2[2]}/${m2[3]}`;
-    }
-    return String(valor);
-  }
-
-  function reorganizarColunas(registos){
-    if(!registos.length) return[];
-    const colunasOriginais=Object.keys(registos[0]||{});
-    const mapearColunas=(nomes)=>{
-      const mapa={};
-      nomes.forEach((nome,idx)=>{
-        const nl=nome.toLowerCase().trim();
-        if(nl==='uf_venda'||nl.includes('uf_venda')) mapa.UF_venda={indice:idx,nome};
-        else if(nl==='situação'||nl==='situacao') mapa.Situacao={indice:idx,nome};
-        else if(nl.includes('tipo')&&nl.includes('consulta')) mapa.TipoConsulta={indice:idx,nome};
-        else if(nl.includes('data')&&(nl.includes('relatório')||nl.includes('relatorio'))) mapa.DataRelatorio={indice:idx,nome};
-        else if(nl.includes('dt_situacao')||nl.includes('dt situacao')) mapa.DtSituacao={indice:idx,nome};
-        else if(nl==='cnpj') mapa.CNPJ={indice:idx,nome};
-      });
-      return mapa;
-    };
-    const colunasMapa=mapearColunas(colunasOriginais);
-    return registos.map((linha)=>{
-      const novaLinha={};
-      colunasOriginais.forEach(coluna=>{
-        let valor=linha[coluna]||'';
-        const nl=coluna.toLowerCase();
-        if(nl.includes('data')||nl.includes('dt_')||nl.includes('date')||nl.includes('data_')) valor=converterDataExcel(valor);
-        novaLinha[coluna]=valor;
-      });
-      if(colunasMapa.Situacao) novaLinha['Situação']=linha[colunasMapa.Situacao.nome]||'';
-      if(colunasMapa.TipoConsulta) novaLinha['Tipo consulta']=linha[colunasMapa.TipoConsulta.nome]||'';
-      novaLinha['Tipo Movimentacao']='Inclusao';
-      if(colunasMapa.DtSituacao) novaLinha['dt_situacao']=novaLinha[colunasMapa.DtSituacao.nome]||'';
-      else if(colunasMapa.DataRelatorio) novaLinha['dt_situacao']=novaLinha[colunasMapa.DataRelatorio.nome]||'';
-      novaLinha['cnpj']='';
-      if(colunasMapa.UF_venda) novaLinha['UF_venda']=linha[colunasMapa.UF_venda.nome]||'';
-      return novaLinha;
-    });
-  }
-
-  function exibirPreview(dados){
-    if(!dados.length) return;
-    const colunasOrdenadas=['placa_Veiculo','numero_chassis_veiculo','numero_renavam','codigo_empresa','silga_UF','Situação','Tipo consulta','Tipo Movimentacao','dt_situacao','cnpj','UF_venda'];
-    const colunas=colunasOrdenadas.filter(col=>dados.some(l=>col in l));
-    let html='<table class="table"><thead><tr>'+colunas.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
-    const n=Math.min(10,dados.length);
-    /* nenhuma coluna deste preview é quantidade — placa, chassi, renavam e
-       código de empresa são identificadores: nada de .num, mas os três
-       identificadores longos ganham .mono para leitura caractere a caractere */
-    const MONO=['placa_Veiculo','numero_chassis_veiculo','numero_renavam'];
-    for(let i=0;i<n;i++) html+='<tr>'+colunas.map(c=>{
-      const v=String(dados[i][c]||'');
-      return `<td${MONO.includes(c)?' class="mono"':''}>${v}</td>`;
-    }).join('')+'</tr>';
-    html+='</tbody></table>';
-    document.getElementById('exc-preview-wrap').innerHTML=html;
-    previewSec.style.display='block';
-  }
-
-  function processarFicheiro(ficheiro){
-    const ext=ficheiro.name.split('.').pop().toLowerCase();
-    if(!['xls','xlsx'].includes(ext)){mostrarStatus('erro','Formato inválido. Use .xls ou .xlsx');return;}
-    if(ficheiro.size/1024/1024>50){mostrarStatus('erro','Arquivo muito grande (máximo 50MB)');return;}
-    state.ficheiro=ficheiro;state.nomeOriginal=ficheiro.name;
-    mostrarStatus('processando','Lendo arquivo...');uploadZone.classList.add('is-over');
-    const leitor=new FileReader();
-    leitor.onload=(ev)=>{
-      try{
-        const dados=new Uint8Array(ev.target.result);
-        const wb=XLSX.read(dados,{type:'array',raw:false});
-        if(!wb.SheetNames.length){mostrarStatus('erro','Arquivo Excel vazio');uploadZone.classList.remove('is-over');return;}
-        const ws=wb.Sheets[wb.SheetNames[0]];
-        const registos=XLSX.utils.sheet_to_json(ws,{defval:'',blankrows:false});
-        if(!registos.length){mostrarStatus('erro','Nenhum dado encontrado');uploadZone.classList.remove('is-over');return;}
-        mostrarStatus('processando','Reorganizando colunas...');
-        state.dadosProcessados=reorganizarColunas(registos);
-        mostrarStatus('sucesso','Arquivo processado com sucesso!');
-        uploadZone.classList.remove('is-over');
-        document.getElementById('exc-d-name').textContent=ficheiro.name;
-        document.getElementById('exc-d-sheets').textContent=wb.SheetNames.length;
-        document.getElementById('exc-d-rows').textContent=state.dadosProcessados.length;
-        const sz=ficheiro.size;
-        document.getElementById('exc-d-size').textContent=sz>1024*1024?(sz/1024/1024).toFixed(2)+' MB':(sz/1024).toFixed(2)+' KB';
-        detailsEl.style.display='grid';transforms.style.display='block';
-        exibirPreview(state.dadosProcessados);
-        actionRow.style.display='flex';
-      } catch(e){mostrarStatus('erro','Erro ao processar: '+e.message);uploadZone.classList.remove('is-over');}
-    };
-    leitor.onerror=()=>mostrarStatus('erro','Erro ao ler o arquivo');
-    leitor.readAsArrayBuffer(ficheiro);
-  }
-
-  function exc_download(){
-    if(!state.dadosProcessados.length) return;
-    const colunasOrdenadas=['placa_Veiculo','numero_chassis_veiculo','numero_renavam','codigo_empresa','silga_UF','Situação','Tipo consulta','Tipo Movimentacao','dt_situacao','cnpj','UF_venda'];
-    const colunas=colunasOrdenadas.filter(col=>state.dadosProcessados.some(l=>col in l));
-    const cabecalho=colunas.map(c=>`"${c}"`).join(';');
-    const linhas=state.dadosProcessados.map(l=>colunas.map(c=>{let v=String(l[c]||'');v=v.replace(/"/g,'""');if(v.includes(';')||v.includes('"')||v.includes('\n'))v=`"${v}"`;return v;}).join(';'));
-    const csv=[cabecalho,...linhas].join('\n');
-    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-    const nomeBase=state.nomeOriginal.replace(/\.[^/.]+$/,'');
-    const link=document.createElement('a');link.href=URL.createObjectURL(blob);
-    link.download=nomeBase+'.csv';link.style.visibility='hidden';
-    document.body.appendChild(link);link.click();document.body.removeChild(link);
-    mostrarStatus('sucesso','Arquivo CSV baixado com sucesso!');
-  }
-  // Expõe globalmente para o onclick no HTML
-  window.exc_download=exc_download;
-  window.exc_reset=function(){
-    state.ficheiro=null;state.nomeOriginal='';state.dadosProcessados=[];
-    fileInput.value='';statusWrap.innerHTML='';
-    transforms.style.display='none';detailsEl.style.display='none';
-    previewSec.style.display='none';actionRow.style.display='none';
-    document.getElementById('exc-preview-wrap').innerHTML='';
-    uploadZone.classList.remove('is-over');
-    mostrarStatus('info','Pronto para processar. Selecione um arquivo Excel para começar.');
-  };
-
-  mostrarStatus('info','Pronto para processar. Selecione um arquivo Excel para começar.');
-})();
-
-/* ============================================================
    APP 5 — CONVERSOR SQL IN
    ============================================================ */
 (function(){
@@ -1704,6 +1675,57 @@ function val_baixar(tipo){
     const ta = document.getElementById('sqlin-ta');
     if(ta) ta.addEventListener('keydown',(e)=>{
       if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();window.sqlin_convert();}
+    });
+  });
+})();
+
+/* ============================================================
+   APP 5b — SQL IN AIT
+   ============================================================ */
+(function(){
+  let lastRaw = '';
+
+  function getLines(){
+    return document.getElementById('sqlait-ta').value
+      .split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+  }
+
+  window.sqlait_convert = function(){
+    const lines = getLines();
+    const emptyEl  = document.getElementById('sqlait-empty');
+    const outputEl = document.getElementById('sqlait-output');
+    const boxEl    = document.getElementById('sqlait-box');
+    const badgeEl  = document.getElementById('sqlait-badge');
+    if(!lines.length){
+      emptyEl.style.display='flex'; outputEl.style.display='none'; return;
+    }
+    lastRaw = 'in ('+lines.map(l=>"'"+l.replace(/'/g,"''")+"'").join(', ')+')';
+    const parts = lines.map(l=>`<span style="color:var(--ok)">'${l}'</span>`).join('<span style="color:var(--text-3)">, </span>');
+    boxEl.innerHTML = `<span style="color:var(--accent);font-weight:600;">in</span> <span style="color:var(--text-2)">(</span>${parts}<span style="color:var(--text-2)">)</span>`;
+    badgeEl.textContent = lines.length+(lines.length===1?' AIT':' AITs');
+    emptyEl.style.display='none'; outputEl.style.display='block';
+  };
+
+  window.sqlait_clear = function(){
+    document.getElementById('sqlait-ta').value='';
+    document.getElementById('sqlait-empty').style.display='flex';
+    document.getElementById('sqlait-output').style.display='none';
+    lastRaw='';
+  };
+
+  window.sqlait_copy = function(){
+    if(!lastRaw) return;
+    const btn = document.getElementById('sqlait-copy-btn');
+    navigator.clipboard.writeText(lastRaw).then(()=>{
+      btn.innerHTML='<svg><use href="#ic-check"/></svg> Copiado!';
+      setTimeout(()=>{ btn.innerHTML='<svg><use href="#ic-copy"/></svg> Copiar'; },1800);
+    }).catch(()=>{ btn.innerHTML='<svg><use href="#ic-alert"/></svg> Erro ao copiar'; });
+  };
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    const ta = document.getElementById('sqlait-ta');
+    if(ta) ta.addEventListener('keydown',(e)=>{
+      if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();window.sqlait_convert();}
     });
   });
 })();
@@ -2180,6 +2202,7 @@ function val_baixar(tipo){
   }
   function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 })();
+
 </script>
 </body>
 </html>

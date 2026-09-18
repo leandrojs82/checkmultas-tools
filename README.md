@@ -6,14 +6,14 @@ Conjunto de utilitários web para processamento de **placas veiculares**, infra�
 
 ## 🚀 Como usar
 
-Basta abrir o arquivo `checkmultas-tools.html` diretamente no navegador:
+Basta abrir o arquivo `index.html` diretamente no navegador:
 
 ```bash
 # Clone o repositório
 git clone https://github.com/seu-usuario/checkmultas-tools.git
 
 # Abra o arquivo no navegador
-open checkmultas-tools.html
+open index.html
 # ou simplesmente dê duplo clique no arquivo
 ```
 
@@ -77,37 +77,66 @@ Converte um ou múltiplos objetos JSON em CSV compatível com Excel.
 
 ---
 
-### 📊 Processador de Excel
+### 🔎 Conversor SQL IN
 
-Lê planilhas `.xlsx` e reorganiza as colunas para o formato padrão do sistema.
-
-**Mapeamento de colunas gerado:**
-
-| Coluna | Campo                   | Observação               |
-|--------|-------------------------|--------------------------|
-| A      | `placa_Veiculo`         |                          |
-| B      | `numero_chassis_veiculo`|                          |
-| C      | `numero_renavam`        |                          |
-| D      | `codigo_empresa`        |                          |
-| E      | `sigla_UF`              |                          |
-| F      | `Situação`              |                          |
-| G      | `Tipo consulta`         |                          |
-| H      | `Tipo Movimentacao`     | Preenchido com `Inclusao`|
-| I      | `dt_situacao`           | Converte serial → DD/MM/AAAA |
-| J      | `cnpj`                  | Deixado em branco        |
-| K      | `UF_venda`              |                          |
+Transforma uma lista de valores (um por linha) em uma cláusula `IN (...)` pronta para colar em uma query.
 
 **Funcionalidades:**
-- Upload por clique ou arrastar e soltar (drag-and-drop)
-- Conversão automática de datas em formato serial Excel para `DD/MM/AAAA`
-- Preview das primeiras 10 linhas após reorganização
-- Exportação CSV com delimitador `;` e encoding UTF-8
+- Ignora linhas em branco e espaços nas pontas
+- Escapa aspas simples (`'` → `''`)
+- Saída com destaque de sintaxe e contagem de itens
+- Cópia para área de transferência com um clique · `Ctrl + Enter` converte
+
+---
+
+### 📄 SQL IN AIT
+
+Versão dedicada do Conversor SQL IN para listas de **AITs**: cole uma AIT por linha e receba a cláusula `IN ('...', '...')` com aspas simples, pronta para a query.
+
+**Funcionalidades:**
+- Ignora linhas em branco e espaços nas pontas
+- Escapa aspas simples (`'` → `''`)
+- Saída com destaque de sintaxe e contagem de AITs
+- Cópia para área de transferência com um clique · `Ctrl + Enter` converte
+
+---
+
+### 🚛 Unificador de Frota
+
+Une até **3 planilhas Excel** de restrição/localização de frota em um único CSV padronizado.
+
+**Funcionalidades:**
+- Upload por clique ou arrastar e soltar, um slot por arquivo
+- Colunas localizadas pelo **nome do cabeçalho**, tolerante a acento, maiúsculas e espaços
+- RENAVAM normalizado para 11 dígitos (apenas números, com zeros à esquerda)
+- Coluna `data_atualizacao` preenchida com a data do processamento
+- Pipeline visual com progresso por etapa (leitura → unificação → CSV)
+
+**Ordem do cabeçalho de saída:**
+
+`placa` · `renavam` · `chassi` · `uf` · `status_localiza` · `data_cadastro_localiza` · `frota` · `data_atualizacao`
+
+---
+
+### 🧩 Verificador de Colunas
+
+Consolida múltiplos arquivos `.txt`, `.csv` e `.xlsx` em um único conjunto, verificando se todos têm a mesma estrutura de colunas.
+
+**Funcionalidades:**
+- Seleção de vários arquivos de uma vez; separador de CSV/TXT detectado automaticamente (`;`, `,` ou tab)
+- Relatório por arquivo com número de linhas e colunas — arquivos com quantidade de colunas divergente são sinalizados
+- Tabela de **tamanho máximo por coluna** com sugestão de `VARCHAR(n)` para dimensionar campos no banco
+- Remoção de arquivos individuais com recálculo automático
+- Exportação do consolidado em CSV ou Excel (`.xlsx`), com nome de arquivo opcional
 
 ---
 
 ## 🎨 Interface
 
-- Tema **dark/light** com alternância manual e persistência via `localStorage`
+- Menu lateral com grupos recolhíveis (**Placas** e **Dados**) e botão para ocultar/exibir
+- **Busca** de ferramentas na barra superior (`Ctrl + K`), com filtro em tempo real que ignora acentos
+- **Favoritos**: marque uma ferramenta com ♡ para exibi-la no topo da página inicial e no menu (persistido via `localStorage`)
+- Tema **dark/light** com alternância na barra superior e persistência via `localStorage`
 - Detecção automática da preferência do sistema operacional (`prefers-color-scheme`)
 - Página inicial com cards de navegação — cada ferramenta abre na mesma página sem recarregar
 - Layout responsivo para desktop e mobile
@@ -128,7 +157,8 @@ Nenhuma outra dependência. HTML, CSS e JavaScript puros.
 
 ```
 checkmultas-tools/
-└── checkmultas-tools.html   # Aplicação completa em arquivo único
+├── index.html   # Aplicação completa em arquivo único
+└── README.md
 ```
 
 Todo o CSS e JavaScript está inline no HTML para facilitar a distribuição — basta enviar o arquivo.
@@ -143,6 +173,7 @@ Estas ferramentas foram desenvolvidas para suportar operações internas com dad
 - **Dados** no padrão dos sistemas Denatran / RENAVAM
 - **Exportação SQL** compatível com PostgreSQL (`IN (...)` com escape de aspas simples)
 - **CSV** compatível com o formato de importação do sistema CheckMultas
+- **Leitura de CSV** com detecção de codificação: tenta UTF-8 e refaz em Windows-1252 quando encontra caracteres inválidos, preservando acentos de arquivos legados
 
 ---
 
